@@ -1,0 +1,132 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <SOAP-ENV:Body>
+  <Authorize xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">
+   <sessionToken></sessionToken>
+   <transaction xsi:type="ns1:BankcardTransactionPro" xmlns:ns1="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard/Pro">
+    <ns2:CustomerData xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions">
+     <ns2:BillingData xsi:nil="true"/>
+     <ns2:CustomerId xsi:nil="true"/>
+     <ns2:CustomerTaxId xsi:nil="true"/>
+     <ns2:ShippingData>
+      <ns2:Name>
+       <ns2:Title>Mr</ns2:Title>
+       <ns2:First>John</ns2:First>
+       <ns2:Middle xsi:nil="true"/>
+       <ns2:Last>Doe</ns2:Last>
+       <ns2:Suffix xsi:nil="true"/>
+      </ns2:Name>
+      <ns2:Address>
+       <ns2:Street1>200 Main St</ns2:Street1>
+       <ns2:Street2 xsi:nil="true"/>
+       <ns2:City>Denver</ns2:City>
+       <ns2:StateProvince>CO</ns2:StateProvince>
+       <ns2:PostalCode>80202</ns2:PostalCode>
+       <ns2:County>Denver</ns2:County>
+       <ns2:CountryCode>USA</ns2:CountryCode>
+      </ns2:Address>
+      <ns2:BusinessName xsi:nil="true"/>
+      <ns2:Phone xsi:nil="true"/>
+      <ns2:Fax xsi:nil="true"/>
+      <ns2:Email xsi:nil="true"/>
+     </ns2:ShippingData>
+    </ns2:CustomerData>
+    <ns3:ReportingData xsi:nil="true" xmlns:ns3="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+    <ns4:Addendum xsi:nil="true" xmlns:ns4="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+	<ns5:ApplicationConfigurationData xsi:nil="true" xmlns:ns5="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard"/>	
+    <ns6:TenderData xmlns:ns6="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard">
+     <ns7:PaymentAccountDataToken xsi:nil="true" xmlns:ns7="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+     <ns8:SecurePaymentAccountData xsi:nil="true" xmlns:ns8="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+     <ns9:EncryptionKeyId xsi:nil="true" xmlns:ns9="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+     <ns10:SwipeStatus xsi:nil="true" xmlns:ns10="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+     <ns11:DeviceSerialNumber xsi:nil="true" xmlns:ns11="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+     <ns6:CardData>
+      <ns6:CardType>NotSet</ns6:CardType>
+      <ns6:CardholderName></ns6:CardholderName>
+      <ns6:PAN></ns6:PAN>
+      <ns6:Expire></ns6:Expire>
+      <ns6:Track1Data xsi:nil="true"/>
+      <ns6:Track2Data></ns6:Track2Data>
+     </ns6:CardData>
+     <ns6:CardSecurityData>
+      <ns6:AVSData>
+       <ns6:CardholderName xsi:nil="true"/>
+       <ns6:Street></ns6:Street>
+       <ns6:City xsi:nil="true"/>
+       <ns6:StateProvince xsi:nil="true"/>
+       <ns6:PostalCode></ns6:PostalCode>
+       <ns6:Phone xsi:nil="true"/>
+       <ns6:Email xsi:nil="true"/>
+      </ns6:AVSData>
+      <ns6:CVDataProvided>NotSet</ns6:CVDataProvided>
+      <ns6:CVData></ns6:CVData>
+      <ns6:KeySerialNumber></ns6:KeySerialNumber>
+      <ns6:PIN></ns6:PIN>
+      <ns6:IdentificationInformation xsi:nil="true"/>
+     </ns6:CardSecurityData>
+     <ns6:EcommerceSecurityData>
+      <ns6:TokenData></ns6:TokenData>
+      <ns6:TokenIndicator>NotSet</ns6:TokenIndicator>
+      <ns6:XID></ns6:XID>
+     </ns6:EcommerceSecurityData>
+    </ns6:TenderData>
+    <ns12:TransactionData xsi:type="ns1:BankcardTransactionDataPro" xmlns:ns12="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard">
+     <ns13:Amount xmlns:ns13="http://schemas.evosnap.com/CWS/v2.0/Transactions">0.0</ns13:Amount>
+     <ns14:CurrencyCode xmlns:ns14="http://schemas.evosnap.com/CWS/v2.0/Transactions">NotSet</ns14:CurrencyCode>
+     <ns15:TransactionDateTime xmlns:ns15="http://schemas.evosnap.com/CWS/v2.0/Transactions"></ns15:TransactionDateTime>
+     <ns16:CampaignId xsi:nil="true" xmlns:ns16="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
+     <ns17:Reference xmlns:ns17="http://schemas.evosnap.com/CWS/v2.0/Transactions"></ns17:Reference>
+     <ns12:AccountType>NotSet</ns12:AccountType>
+     <ns12:AlternativeMerchantData xsi:nil="true"/>
+     <ns12:ApprovalCode xsi:nil="true"/>
+     <ns12:CashBackAmount>0.0</ns12:CashBackAmount>
+     <ns12:CustomerPresent>NotSet</ns12:CustomerPresent>
+     <ns12:EmployeeId></ns12:EmployeeId>
+     <ns12:EntryMode>NotSet</ns12:EntryMode>
+     <ns12:InternetTransactionData xsi:nil="true"/>
+     <ns12:InvoiceNumber xsi:nil="true"/>
+     <ns12:OrderNumber>1</ns12:OrderNumber>
+     <ns12:TerminalId xsi:nil="true"/>
+     <ns12:TipAmount>0.0</ns12:TipAmount>
+     <ns12:BatchAssignment xsi:nil="true"/>
+     <ns12:LaneId xsi:nil="true"/>
+     <ns12:ScoreThreshold xsi:nil="true"/>
+     <ns12:TransactionCode>NotSet</ns12:TransactionCode>
+     <ns1:ManagedBilling xsi:nil="true"/>
+     <ns1:Level2Data>
+      <ns12:BaseAmount>0.0</ns12:BaseAmount>
+      <ns12:CommodityCode xsi:nil="true"/>
+      <ns12:CompanyName xsi:nil="true"/>
+      <ns12:CustomerCode></ns12:CustomerCode>
+      <ns12:DestinationPostal xsi:nil="true"/>
+      <ns12:Description xsi:nil="true"/>
+      <ns12:OrderNumber></ns12:OrderNumber>
+      <ns12:RequesterName xsi:nil="true"/>
+      <ns12:ShipFromPostalCode xsi:nil="true"/>
+      <ns12:ShipmentId xsi:nil="true"/>
+      <ns12:TaxExempt>
+       <ns12:IsTaxExempt>NotSet</ns12:IsTaxExempt>
+       <ns12:TaxExemptNumber></ns12:TaxExemptNumber>
+      </ns12:TaxExempt>
+      <ns12:Tax>
+       <ns12:Amount>0.0</ns12:Amount>
+       <ns12:InvoiceNumber xsi:nil="true"/>
+       <ns12:ItemizedTaxes xsi:nil="true"/>
+      </ns12:Tax>
+     </ns1:Level2Data>
+     <ns1:LineItemDetails xsi:nil="true"/>
+     <ns1:PINlessDebitData xsi:nil="true"/>
+     <ns1:IIASData xsi:nil="true"/>
+    </ns12:TransactionData>
+    <ns1:InterchangeData>
+     <ns1:BillPayment>NotSet</ns1:BillPayment>
+     <ns1:ExistingDebt>NotSet</ns1:ExistingDebt>
+     <ns1:TotalNumberOfInstallments>0</ns1:TotalNumberOfInstallments>
+     <ns1:CurrentInstallmentNumber>0</ns1:CurrentInstallmentNumber>
+    </ns1:InterchangeData>
+   </transaction>
+   <applicationProfileId></applicationProfileId>
+   <merchantProfileId></merchantProfileId>
+   <workflowId></workflowId>
+  </Authorize>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>

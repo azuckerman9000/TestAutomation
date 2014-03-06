@@ -1,0 +1,81 @@
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard/Pro" xmlns:ns3="http://schemas.evosnap.com/CWS/v2.0/Transactions" xmlns:ns4="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+ <SOAP-ENV:Body>
+<Authorize xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">
+<sessionToken>${Test 1: SignOnWithTokenResult}</sessionToken>
+<transaction xsi:type="ns2:BankcardTransactionPro">
+    <ns3:CustomerData>
+     <ns3:BillingData xsi:nil="true" />
+     <ns3:CustomerId xsi:nil="true" />
+     <ns3:CustomerTaxId xsi:nil="true" />
+     <ns3:ShippingData>
+      <ns3:Name>
+       <ns3:Title>Mr</ns3:Title>
+       <ns3:First>John</ns3:First>
+       <ns3:Middle xsi:nil="true" />
+       <ns3:Last>Doe</ns3:Last>
+       <ns3:Suffix xsi:nil="true" />
+      </ns3:Name>
+      <ns3:Address>
+       <ns3:Street1>200 Main St</ns3:Street1>
+       <ns3:Street2 xsi:nil="true" />
+       <ns3:City>Denver</ns3:City>
+       <ns3:StateProvince>CO</ns3:StateProvince>
+       <ns3:PostalCode>80202</ns3:PostalCode>
+       <ns3:County>Denver</ns3:County>
+       <ns3:CountryCode>USA</ns3:CountryCode>
+      </ns3:Address>
+      <ns3:BusinessName xsi:nil="true" />
+      <ns3:Phone xsi:nil="true" />
+      <ns3:Fax xsi:nil="true" />
+      <ns3:Email xsi:nil="true" />
+     </ns3:ShippingData>
+    </ns3:CustomerData>
+    <ns3:ReportingData xsi:nil="true" />
+    <ns3:Addendum xsi:nil="true" />
+	<ns4:ApplicationConfigurationData xsi:nil="true" />	
+    <ns4:TenderData>
+     <ns3:PaymentAccountDataToken xsi:nil="true" />
+     <ns3:SecurePaymentAccountData xsi:nil="true" />
+     <ns3:EncryptionKeyId xsi:nil="true" />
+     <ns3:SwipeStatus xsi:nil="true" />
+     <ns3:DeviceSerialNumber xsi:nil="true" />
+     <ns4:CardData>
+      <ns4:CardType>Visa</ns4:CardType>
+      <ns4:CardholderName />
+      <ns4:Track1Data xsi:nil="true" />
+      <ns4:Track2Data>4003000123456781=15125025432198712345</ns4:Track2Data>
+     </ns4:CardData>
+     </ns4:TenderData>
+    <ns4:TransactionData xsi:type="ns2:BankcardTransactionDataPro">
+     <ns3:Amount>1.00</ns3:Amount>
+     <ns3:CurrencyCode>USD</ns3:CurrencyCode>
+     <ns3:TransactionDateTime />
+     <ns3:CampaignId xsi:nil="true" />
+     <ns3:Reference />
+     <ns4:AccountType>NotSet</ns4:AccountType>
+     <ns4:AlternativeMerchantData xsi:nil="true" />
+     <ns4:ApprovalCode xsi:nil="true" />
+     <ns4:CustomerPresent>Present</ns4:CustomerPresent>
+     <ns4:EmployeeId>1</ns4:EmployeeId>
+     <ns4:EntryMode>TrackDataFromMSR</ns4:EntryMode>
+     <ns4:InternetTransactionData xsi:nil="true" />
+     <ns4:InvoiceNumber xsi:nil="true" />
+     <ns4:OrderNumber>1</ns4:OrderNumber>
+     <ns4:TerminalId xsi:nil="true" />
+     <ns4:TipAmount>2.00</ns4:TipAmount>
+     <ns4:BatchAssignment xsi:nil="true" />
+     <ns4:LaneId xsi:nil="true" />
+     <ns4:ScoreThreshold xsi:nil="true" />
+     <ns4:TransactionCode>NotSet</ns4:TransactionCode>
+     <ns2:ManagedBilling xsi:nil="true" />
+     <ns2:LineItemDetails xsi:nil="true" />
+     <ns2:PINlessDebitData xsi:nil="true" />
+     <ns2:IIASData xsi:nil="true" />
+    </ns4:TransactionData>
+    </transaction>
+   <applicationProfileId>2601</applicationProfileId>
+   <merchantProfileId>Auto_SOAP_Restaurant</merchantProfileId>
+   <workflowId>1257A00001</workflowId>
+  </Authorize>
+ </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
