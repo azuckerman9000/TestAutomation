@@ -113,7 +113,7 @@ class TCBuildGui(tk.Frame):
         self.host_menubutton.grid(sticky=tk.NW,row=3,column=1)
         self.host_menu = tk.Menu(self.host_menubutton)
         self.host_menubutton["menu"] = self.host_menu
-        for item in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder"]:
+        for item in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS"]:
             self.host_menu.add_checkbutton(label=item,variable=self.host_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("host"))
             
         self.industry_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.industry_menuvar, state="active")
@@ -134,7 +134,7 @@ class TCBuildGui(tk.Frame):
         self.environment_menubutton.grid(sticky=tk.NW,row=6,column=1)
         self.environment_menu = tk.Menu(self.environment_menubutton)
         self.environment_menubutton["menu"] = self.environment_menu
-        for item in ["TEST","CERT"]:
+        for item in ["TEST","CERT","PROD"]:
             self.environment_menu.add_checkbutton(label=item,variable=self.environment_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("environment"))
             
         self.card_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.card_menuvar, state="active")
@@ -405,19 +405,28 @@ class SaveMerchantProfileFrame:
         self.merchselect_menubutton.grid(sticky=tk.N,row=0,column=0)
         self.merchselect_menu = tk.Menu(self.merchselect_menubutton)
         self.merchselect_menubutton["menu"] = self.merchselect_menu
-        for merchname in sorted(self.merchinfo.keys()):
-            self.merchselect_menu.add_checkbutton(label=merchname,variable=self.merchselect_menuvar,onvalue=merchname,offvalue="",command=self.displayMerchRecord)
+        self.merchselect_menubutton.bind("<Button-1>",self.populateMerchMenu)        
         
         self.merchdisp_canvas = tk.Canvas(self.savemp_frame,relief=tk.RIDGE,bd=2,width=275,height=225)
         
         self.merchsave_button = tk.Button(self.savemp_frame,text="Save Merchant Profile")
         self.merchsave_message = tk.Message(self.savemp_frame,textvariable=self.merchsave_messagevar,aspect=800)
         
+    def populateMerchMenu(self,event):
+        self.merchselect_menu.delete(0,tk.END)
+        if builder.environment_menuitemvar.get() != "":
+            for merchname, info in sorted(self.merchinfo.items()):
+                if builder.environment_menuitemvar.get() == info["Environment"]:           
+                    self.merchselect_menu.add_checkbutton(label=merchname,variable=self.merchselect_menuvar,onvalue=merchname,offvalue="",command=self.displayMerchRecord)
+        else:
+            for merchname in sorted(self.merchinfo.keys()):
+                self.merchselect_menu.add_checkbutton(label=merchname,variable=self.merchselect_menuvar,onvalue=merchname,offvalue="",command=self.displayMerchRecord)
+                
     def displayMerchRecord(self):
         self.merchselect_menubuttonvar.set(self.merchselect_menuvar.get())
         self.merchsave_messagevar.set("")
         
-        if self.merchselect_menuvar.get() != "":
+        if self.merchselect_menuvar.get() != "":                
             merchrecord = json.dumps(self.merchinfo[self.merchselect_menuvar.get()],sort_keys=True, indent=2, separators =(',',':'))
             for Id in self.merchdisp_canvas.find_all():
                 self.merchdisp_canvas.delete(Id)

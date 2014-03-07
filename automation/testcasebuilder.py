@@ -67,7 +67,7 @@ class Transaction:
             #self.getService()
         
     def getService(self):
-        URL = "http://localhost:2480/cluster/" + self.DBname + "/Service"    
+        URL = "http://localhost:2480/cluster/" + self.DBname + "/Service/50"    
         r1 = requests.get(URL, auth=HTTPBasicAuth('admin','admin'))
         svc_resp = json.loads(r1.text)
         
@@ -84,7 +84,7 @@ class Transaction:
             sys.exit()
         
     def getMerchant(self):
-        clustURL = "http://localhost:2480/cluster/" + self.DBname + "/Merchant"        
+        clustURL = "http://localhost:2480/cluster/" + self.DBname + "/Merchant/100"        
         r1 = requests.get(clustURL, auth=HTTPBasicAuth('admin','admin'))
         merch_resp = json.loads(r1.text)
         
@@ -298,7 +298,7 @@ class Transaction:
             TestCaseParams[item] = True
             
         self.TestCaseRecordId = ""        
-        clustURL = "http://localhost:2480/cluster/" + self.DBname + "/TestCase"    
+        clustURL = "http://localhost:2480/cluster/" + self.DBname + "/TestCase/100"    
         r = requests.get(clustURL, auth=HTTPBasicAuth('admin','admin'))
         testcase_resp = json.loads(r.text)
         for testcase in testcase_resp["result"]:
@@ -356,7 +356,7 @@ class Transaction:
         return TestCases
     
     def saveMerchantProfile(self,DBname):
-        clustURL = "http://localhost:2480/cluster/" + DBname + "/Merchant/50"
+        clustURL = "http://localhost:2480/cluster/" + DBname + "/Merchant/100"
         docURL = "http://localhost:2480/document/" + DBname + "/"
         r = requests.get(clustURL, auth=HTTPBasicAuth('admin','admin'))
         Merchants = {}
@@ -378,7 +378,7 @@ class Transaction:
         if self.MessageType not in ["SOAP","REST"]:    
             print('Invalid Message Type. Must be one of: "SOAP","REST"')
             sys.exit()
-        if self.Host not in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder"]:    
+        if self.Host not in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS"]:    
             print('Invalid Host. Must be one of: "EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox"')
             sys.exit()
         if self.IndustryType not in ["Retail","Restaurant","MOTO","Ecommerce"]:    

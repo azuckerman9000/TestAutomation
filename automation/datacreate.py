@@ -138,8 +138,8 @@ class Database:
             print("Truncated Records in New Data File")
         datafile.close()        
 
-    def createLinkMap(self):
-        mapfile = open(self.MapFile, 'r')    #Creates hashmap for data relationships - with id and related ids
+    def createLinkMap(self):        
+        mapfile = open(self.MapFile, 'r')    #Creates hashmap for data relationships - with id and related ids eg. "2601",:["6B2866C8FD500001"]        
         datamap = {}
         for line in mapfile:
             json_entry = json.loads(line)
@@ -147,10 +147,10 @@ class Database:
         mapfile.close()    
         
         URL = "http://localhost:2480/cluster/" + self.DBname + "/"
-        print(datamap)
+        
         IdMap = {}
-        for classname in self.ClassNames:                                        # Creates hashmap for key id vs. record id
-            r = requests.get(URL + classname + "/50", auth=HTTPBasicAuth('admin','admin'))
+        for classname in ["Service","Credentials","Merchant","Application"]:              # Creates hashmap for key id vs. record id eg. 'Merchant1':'12:3'
+            r = requests.get(URL + classname + "/100", auth=HTTPBasicAuth('admin','admin'))
             json_resp = json.loads(r.text)
             if classname == "Service":
                 Id = "ServiceId"
@@ -168,7 +168,8 @@ class Database:
                         IdMap[record[Id]] = record["@rid"]
                 except:
                     continue
-        print(IdMap)                      
+            
+                             
         Map = {}                            #Creates relational record id hashmap
         for Id, List in datamap.items():
             if len(List) > 1:            
@@ -199,7 +200,10 @@ class Database:
             updated = False
             for property in class_resp["properties"]:                
                 if property["type"].find("LINK") != -1 and property["name"] not in record_resp.keys(): #If new row was added in map file, add the links to the record                   
-                    record_resp[property["name"]] = RelatedRecords
+                    if property["type"].find("LIST") != -1:
+                        record_resp[property["name"]] = list([RelatedRecords]) # This is ensuring that when a Service or Credential record has only a single link in the linklist, there is no type error in updating the record
+                    else:
+                        record_resp[property["name"]] = RelatedRecords
                     updated = True    
                 elif property["type"].find("LINK") != -1 and property["name"] in record_resp.keys(): #If a new link was added to a linklist in mapfile eg: New Service to ServiceKey, or a link was changed eg: changed MerchantProfile to different ServiceKey, add/change those links in record
                     if set(RelatedRecords) != set(record_resp[property["name"]]) & set(RelatedRecords):
@@ -208,9 +212,12 @@ class Database:
                 else:                    
                     continue                    
                     
-            if updated == True:        
+            if updated == True:                       
                 r = requests.put(url = docURL + RecordId, params=param, headers=headers, data=json.dumps(record_resp), auth=HTTPBasicAuth('admin','admin'))
-                print("Updated record " + RecordId + " with related record links ")  
+                if r.status_code == 200:                
+                    print("Updated record " + RecordId + " with related record links ")
+                else:
+                    print("An Error occurred updating record " + RecordId + ".\n" + r.text + "\nURL= " + r.url + "\nContent= " + r.request.body)  
             else:
                 continue
         
@@ -262,7 +269,7 @@ class Database:
         datafile = open(self.RecordFile, 'w')
         for classname in self.ClassNames:
             if classname not in ["TenderData","TestCase"]: #Only base records, not link records
-                r = requests.get(clustURL + classname, auth=HTTPBasicAuth('admin','admin'))
+                r = requests.get(clustURL + classname +"/1000", auth=HTTPBasicAuth('admin','admin'))
                 clust_resp = json.loads(r.text)
                 for record in clust_resp["result"]:
                     delkeys = []
@@ -288,7 +295,7 @@ class Database:
             
     def getCluster(self, classname):
         clustURL = "http://localhost:2480/cluster/" + self.DBname + "/"
-        r = requests.get(clustURL + classname +"/50", auth=HTTPBasicAuth('admin','admin'))
+        r = requests.get(clustURL + classname +"/100", auth=HTTPBasicAuth('admin','admin'))
         clust_resp = json.loads(r.text)
         return clust_resp
     

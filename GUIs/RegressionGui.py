@@ -49,7 +49,7 @@ class RegressionGui(tk.Frame):
         self.envselect_menubutton.grid(sticky=tk.NW,row=1,column=0)
         self.envselect_menu = tk.Menu(self.envselect_menubutton)
         self.envselect_menubutton["menu"] = self.envselect_menu
-        for item in ["TEST","CERT"]:
+        for item in ["TEST","CERT","PROD"]:
             self.envselect_menu.add_checkbutton(label=item,variable=self.envselect_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("envselect"))
         
         self.messagetype_menubutton = tk.Menubutton(self.main_frame,relief="raised",textvariable=self.messagetype_menuvar,state="active")
@@ -63,7 +63,7 @@ class RegressionGui(tk.Frame):
         self.hosttype_menubutton.grid(sticky=tk.NW,row=1,column=2)
         self.hosttype_menu = tk.Menu(self.hosttype_menubutton)
         self.hosttype_menubutton["menu"] = self.hosttype_menu
-        for item in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder"]:
+        for item in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS"]:
             self.hosttype_menu.add_checkbutton(label=item,variable=self.hosttype_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("hosttype"))
         
         self.tcdisp_scroll = tk.Scrollbar(self.main_frame,orient=tk.VERTICAL)
@@ -76,7 +76,7 @@ class RegressionGui(tk.Frame):
         self.create_message = tk.Message(self.main_frame, textvariable=self.create_messagevar,aspect=1100)
     
     def getTestCases(self):
-        URL = "http://localhost:2480/cluster/" + self.dbname_var.get() + "/TestCase"
+        URL = "http://localhost:2480/cluster/" + self.dbname_var.get() + "/TestCase/100"
         r = requests.get(URL, auth=HTTPBasicAuth('admin','admin'))
         self.testcases = json.loads(r.text)
         
