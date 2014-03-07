@@ -321,8 +321,8 @@ class ViewRecordsFrame:
         
         self.query_entryvar = tk.StringVar()        
         
-        self.rectextid = int()                
-        
+        self.rectextid = int()        
+
     def createWidgets(self):        
         self.selectclass_menubutton = tk.Menubutton(self.viewrec_frame,relief="raised",textvariable=self.selectclass_menuvar)
         self.selectclass_menubutton.grid(sticky=tk.N,row=0,column=0)
@@ -348,8 +348,9 @@ class ViewRecordsFrame:
         self.showall_button = tk.Button(self.recordbyquery_frame,text="Show All Records of Class",command=self.showAllRecords)
         
         self.canvasscroll = tk.Scrollbar(self.viewrec_frame, orient=tk.VERTICAL)        
-        self.recorddisplay_canvas = tk.Canvas(self.viewrec_frame,relief=tk.RIDGE, bd=2,height=400,yscrollcommand=self.canvasscroll.set)               
+        self.recorddisplay_canvas = tk.Canvas(self.viewrec_frame,relief=tk.RIDGE, bd=2,height=400,cursor="xterm",yscrollcommand=self.canvasscroll.set)               
         self.canvasscroll.config(command=self.recorddisplay_canvas.yview)
+        self.recorddisplay_canvas.bind("<Button-1>",self.startHighlight)        
         
     def populateMenus(self):
         for item in gui.DB.ClassNames:
@@ -412,7 +413,7 @@ class ViewRecordsFrame:
             self.rectextid = self.recorddisplay_canvas.create_text(10,10,anchor=tk.NW,text=gui.DB.getRecord(self.record_menuvar.get(),self.extendrecord_var.get()))            
             self.recorddisplay_canvas.grid(sticky=tk.NW,row=2,column=0, columnspan=3)            
             self.canvasscroll.grid(sticky=tk.NE+tk.SE,row=2,column=1)
-            self.recorddisplay_canvas.config(scrollregion=self.recorddisplay_canvas.bbox(tk.ALL))
+            self.recorddisplay_canvas.config(scrollregion=self.recorddisplay_canvas.bbox(tk.ALL))            
             
     def deleteRecord(self):
         self.deleterecord_button["state"] = "disabled"
@@ -447,6 +448,39 @@ class ViewRecordsFrame:
         self.canvasscroll.grid(sticky=tk.NE+tk.SE,row=2,column=1)
         self.recorddisplay_canvas.config(scrollregion=self.recorddisplay_canvas.bbox(tk.ALL)) 
         
+    def startHighlight(self,event):
+        x = event.widget.canvasx(event.x)
+        y = event.widget.canvasy(event.y)
+        specifier = "@"+str(x)+","+str(y)
+        
+        event.widget.select_from(self.rectextid,specifier)
+        self.recorddisplay_canvas.bind("<Motion>",self.highlightText)
+        self.recorddisplay_canvas.bind("<ButtonRelease>",self.endHighlight)
+        
+    def highlightText(self,event):
+        x = event.widget.canvasx(event.x)
+        y = event.widget.canvasy(event.y)        
+        event.widget.select_to(self.rectextid,"@%d,%d" % (x,y))        
+        
+    def endHighlight(self,event):
+        self.recorddisplay_canvas.unbind("<Motion>")
+        self.recorddisplay_canvas.unbind("<ButtonRelease>")                
+        self.recorddisplay_canvas.bind("<Control-KeyPress-c>",self.copyText)
+        self.recorddisplay_canvas.focus_set()       
+        
+    def copyText(self,event):        
+        self.viewrec_frame.clipboard_clear()
+        self.viewrec_frame.clipboard_append(self.recorddisplay_canvas.selection_get())       
+        self.recorddisplay_canvas.unbind("<Control-KeyPress-c>")
+        
+        
+        
+        
+        
+        
+        
+        
+       
              
             
             

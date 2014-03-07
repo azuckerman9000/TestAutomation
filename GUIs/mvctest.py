@@ -1,87 +1,111 @@
-import tkinter as tk
+from tkinter import *
 
+class MyCanvas(Frame):
 
-class Observable:
-    def __init__(self, initialValue=None):
-        self.data = initialValue
-        self.callbacks = {}
-
-    def addCallback(self, func):
-        self.callbacks[func] = 1
-
-    def delCallback(self, func):
-        del self.callback[func]
-
-    def _docallbacks(self):
-        for func in self.callbacks:
-             func(self.data)
-
-    def set(self, data):
-        self.data = data
-        self._docallbacks()
-
-    def get(self):
-        return self.data
-
-    def unset(self):
-        self.data = None
-
-
-class Model:
-    def __init__(self):
-        self.myMoney = Observable(0)
-
-    def addMoney(self, value):
-        self.myMoney.set(self.myMoney.get() + value)
-
-    def removeMoney(self, value):
-        self.myMoney.set(self.myMoney.get() - value)
-
-
-class View(tk.Toplevel):
-    def __init__(self, master):
-        tk.Toplevel.__init__(self, master)
-        self.protocol('WM_DELETE_WINDOW', self.master.destroy)
-        tk.Label(self, text='My Money').pack(side='left')
-        self.moneyCtrl = tk.Entry(self, width=8)
-        self.moneyCtrl.pack(side='left')
-        
-    def SetMoney(self, money):
-        self.moneyCtrl.delete(0,'end')
-        self.moneyCtrl.insert('end', str(money))        
-
-
-class ChangerWidget(tk.Toplevel):
-    def __init__(self, master):
-        tk.Toplevel.__init__(self, master)
-        self.addButton = tk.Button(self, text='Add', width=8)
-        self.addButton.pack(side='left')
-        self.removeButton = tk.Button(self, text='Remove', width=8)
-        self.removeButton.pack(side='left')        
-
-
-class Controller:
     def __init__(self, root):
-        self.model = Model()
-        self.model.myMoney.addCallback(self.MoneyChanged)
-        self.view1 = View(root)
-        self.view2 = ChangerWidget(self.view1)
-        self.view2.addButton.config(command=self.AddMoney)
-        self.view2.removeButton.config(command=self.RemoveMoney)
-        self.MoneyChanged(self.model.myMoney.get())
-        
-    def AddMoney(self):
-        self.model.addMoney(10)
+        Frame.__init__(self, root)
 
-    def RemoveMoney(self):
-        self.model.removeMoney(10)
+        self.canvas = Canvas(self)
+        self.canvas.pack(fill=BOTH, expand=1)
 
-    def MoneyChanged(self, money):
-        self.view1.SetMoney(money)
+        # standard bindings
+        self.canvas.bind("<Double-Button-1>", self.set_focus)
+        self.canvas.bind("<Button-1>", self.set_cursor)
+        self.canvas.bind("<Key>", self.handle_key)
 
+        # add a few items to the canvas
+        self.canvas.create_text(50, 50, text="hello")
+        self.canvas.create_text(50, 100, text="world")
 
-if __name__ == '__main__':
-    root = tk.Tk()
-    root.withdraw()
-    app = Controller(root)
-    root.mainloop()
+    def highlight(self, item):
+        # mark focused item.  note that this code recreates the
+        # rectangle for each update, but that's fast enough for
+        # this case.
+        bbox = self.canvas.bbox(item)
+        self.canvas.delete("highlight")
+        if bbox:
+            i = self.canvas.create_rectangle(
+                bbox, fill="white",
+                tag="highlight"
+                )
+            self.canvas.lower(i, item)
+
+    def has_focus(self):
+        return self.canvas.focus()
+
+    def has_selection(self):
+        # hack to work around bug in Tkinter 1.101 (Python 1.5.1)
+        return self.canvas.tk.call(self.canvas._w, 'select', 'item')
+
+    def set_focus(self, event):
+        if self.canvas.type(CURRENT) != "text":
+            return
+
+        self.highlight(CURRENT)
+
+        # move focus to item
+        self.canvas.focus_set() # move focus to canvas
+        self.canvas.focus(CURRENT) # set focus to text item
+        self.canvas.select_from(CURRENT, 0)
+        self.canvas.select_to(CURRENT, END)
+
+    def set_cursor(self, event):
+        # move insertion cursor
+        item = self.has_focus()
+        if not item:
+            return # or do something else
+
+        # translate to the canvas coordinate system
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+
+        self.canvas.icursor(item, "@%d,%d" % (x, y))
+        self.canvas.select_clear()
+
+    def handle_key(self, event):
+        # widget-wide key dispatcher
+        item = self.has_focus()
+        if not item:
+            return
+
+        insert = self.canvas.index(item, INSERT)
+
+        if event.char >= " ":
+            # printable character
+            if self.has_selection():
+                self.canvas.dchars(item, SEL_FIRST, SEL_LAST)
+                self.canvas.select_clear()
+            self.canvas.insert(item, "insert", event.char)
+            self.highlight(item)
+
+        elif event.keysym == "BackSpace":
+            if self.has_selection():
+                self.canvas.dchars(item, SEL_FIRST, SEL_LAST)
+                self.canvas.select_clear()
+            else:
+                if insert > 0:
+                    self.canvas.dchars(item, insert-1, insert)
+            self.highlight(item)
+
+        # navigation
+        elif event.keysym == "Home":
+            self.canvas.icursor(item, 0)
+            self.canvas.select_clear()
+        elif event.keysym == "End":
+            self.canvas.icursor(item, END)
+            self.canvas.select_clear()
+        elif event.keysym == "Right":
+            self.canvas.icursor(item, insert+1)
+            self.canvas.select_clear()
+        elif event.keysym == "Left":
+            self.canvas.icursor(item, insert-1)
+            self.canvas.select_clear()
+
+        else:
+            pass # print event.keysym
+
+# try it out (double-click on a text to enable editing)
+c = MyCanvas(Tk())
+c.pack()
+
+mainloop()
