@@ -53,7 +53,7 @@ class GuiFrame(tk.Frame):
         self.createprops_button["command"] = self.DB.createClassProperties
         
         self.createrecords_button["state"] = "active"
-        self.createrecords_button["command"] = self.DB.addRecords
+        self.createrecords_button["command"] = self.addRecords
         
         self.createlinks_button["state"] = "active"
         self.createlinks_button["command"] = self.DB.updateRecordLinks
@@ -68,8 +68,86 @@ class GuiFrame(tk.Frame):
         self.prop_frame.addPropClassMenuItems()
         self.prop_frame.addPropTypeMenuItems()
         
-        self.viewrec_frame.populateMenus()   
+        self.viewrec_frame.populateMenus()
         
+    def addRecords(self):
+        self.DB.addRecords
+        if self.DB.startlinkframe == True:
+            self.mapping_frame = CreateMapRowFrame(self.DB) 
+            
+class CreateMapRowFrame:
+    def __init__(self,DB):
+        self.createmaps_frame = tk.Toplevel(height=400,width=400)
+        self.createmaps_frame.grid()
+        self.createVariables()
+        self.createWidgets()
+        self.DB = DB               
+        
+        for classname, val in self.DB.recstolink:
+            self.reckey_classname[val[1]] = classname
+            self.reckey_recordid[val[1]] = val[0]
+            
+        for classname, val in self.DB.linkchoices:
+            self.linkkey_classname[val[1]] = classname
+            self.linkkey_recordid[val[1]] = val[0]
+            self.classname_linkkeys[classname].append(val[1])        
+        
+    def createVariables(self):
+        self.recordstolink_listvar = tk.StringVar()
+        for reckey in self.reckey_classname.keys():
+            self.recordstolink_listvar.set(self.recordstolink_listvar.get() + reckey + " ")                       
+        
+        self.linkchoices_listvar = tk.StringVar()        
+    
+    def createWidgets(self):
+        self.recordstolink_scroll = tk.Scrollbar(self.createmaps_frame,orient=tk.VERTICAL)
+        self.recordstolink_scroll.grid(sticky=tk.N+tk.S,row=0,column=1)        
+        self.recordstolink_listbox = tk.Listbox(self.createmaps_frame,width=30,listvariable=self.recordstolink_listvar,activestyle="dotbox",yscrollcommand=self.recordstolink_scroll.set)
+        self.recordstolink_scroll["command"] = self.recordstolink_listbox.yview
+        self.recordstolink_listbox.grid(sticky=tk.N,row=0,column=0)
+        
+        self.recordstolink_display = tk.Canvas(self.createmaps_frame,relief=tk.RIDGE,bd=2)
+        
+        self.linkchoices_scroll = tk.Scrollbar(self.createmaps_frame,orient=tk.VERTICAL)
+        self.linkchoices_scroll.grid(sticky=tk.N+tk.S,row=0,column=3)        
+        self.linkchoices_listbox = tk.Listbox(self.createmaps_frame,width=30,listvariable=self.linkchoices_listvar,activestyle="dotbox",yscrollcommand=self.linkchoices_scroll.set)
+        self.linkchoices_scroll["command"] = self.linkchoices_listbox.yview
+        self.linkchoices_listbox.grid(sticky=tk.N,row=0,column=2)
+        
+        self.linkchoices_display = tk.Canvas(self.createmaps_frame,relief=tk.RIDGE,bd=2)
+        
+        self.createmaprow_button = tk.Button(self.createmaps_frame,text="Create Map Row")
+        
+        self.recordstolink_listbox.bind("<ButtonRelease>",self.showRecordsToLink)
+        
+    def showRecordsToLink(self,event):
+        selectedrec = event.widget.get(event.widget.curselection()[0])
+        if self.reckey_classname[selectedrec] in ["Service","Credentials"]:
+            self.linkchoices_listbox["selectmode"] = tk.MULTIPLE
+        else:
+            self.linkchoices_listbox["selectmode"] = tk.BROWSE
+        self.recordstolink_display.create_text(0,0,anchor=tk.NW,text=self.DB.getRecord(self.reckey_recordid[selectedrec][1:],0))
+        self.recordstolink_display.grid(sticky=tk.N,row=1,column=0,columnspan=2)
+        self.showPossibleLinks(self.reckey_classname[selectedrec])
+        
+    def showPossibleLinks(self,classname):
+        self.linkchoices_listvar.set("")
+        for linkkey in self.classname_linkkeys[classname]:
+            self.linkchoices_listvar.set(self.linkchoices_listvar.get() + linkkey + " ")        
+        self.linkchoices_listbox.bind("<ButtonRelease>",self.selectChoices)
+        
+    def selectChoices(self,event):
+        choices = []        
+        if len(event.widget.curselection()) > 1:            
+            for index in event.widget.curselection():
+                choices.append(event.widget.get(index))
+        else:
+            choices.append(event.widget.get(event.widget.curselection()[0]))
+        text = ""
+        for choice in choices:
+            text = text + self.DB.getRecord(self.linkkey_recordid[choice][1:],0) + "\n"
+        self.linkchoices_display.create_text(0,0,anchor=tk.NW,text=text)
+        self.linkchoices_display.grid(sticky=tk.N,row=1,column=2,columnspan=2)
                 
 class NewPropertyFrame:
     def __init__(self,frame):        
@@ -441,7 +519,7 @@ class ViewRecordsFrame:
             
     def showAllRecords(self):
         for Id in self.recorddisplay_canvas.find_all():
-                self.recorddisplay_canvas.delete(Id)
+            self.recorddisplay_canvas.delete(Id)
         clustertext = json.dumps(self.cluster,sort_keys=True, indent=2, separators =(',',':'))
         self.rectextid = self.recorddisplay_canvas.create_text(10,10,anchor=tk.NW,text=clustertext)
         self.recorddisplay_canvas.grid(sticky=tk.NW,row=2,column=0, columnspan=3)            

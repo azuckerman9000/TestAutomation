@@ -116,6 +116,7 @@ class Database:
         
         docURL = "http://localhost:2480/document/" +self.DBname
         headers = {"content-type":"application/json"}
+        linkind = []
         for line in datafile:
             if line != "\n":
                 linegroup = line.split('|')
@@ -123,20 +124,83 @@ class Database:
                     payload = linegroup[1]        
                     r2 = requests.post(docURL, data=payload, headers=headers, auth=HTTPBasicAuth('admin','admin'))
                     print("Record of class " + linegroup[0] + " added to database")
+                    if linegroup[0] not in linkind and linegroup[0] in ["Service","Credentials","Merchant","Application"]:
+                        linkind.append(linegroup[0]) 
                 elif File == self.NewRecordFile:    
                     masterfile = open(self.RecordFile, 'a', encoding="utf-8")
                     payload = linegroup[1]    
                     r2 = requests.post(docURL, data=payload, headers=headers, auth=HTTPBasicAuth('admin','admin'))
                     print("Record of class " + linegroup[0] + " added to database")
-                    masterfile.write(linegroup[0] + "|" + payload + "\n")
+                    masterfile.write(linegroup[0] + "|" + payload)
                     print("New Record copied to master data file")
                     masterfile.close()
+                    if linegroup[0] not in linkind and linegroup[0] in ["Service","Credentials","Merchant","Application"]:
+                        linkind.append(linegroup[0]) 
+                
         
         if self.FileInd == "new":
             datafile.seek(0,0)
             datafile.truncate()
             print("Truncated Records in New Data File")
-        datafile.close()        
+        datafile.close()
+        
+        if len(linkind) > 0:
+            self.addMapRows(linkind)
+            self.startlinkframe = True
+        else:
+            self.startlinkframe = False
+            
+    def addMapRows(self,linkind):
+        mapfile = open(self.MapFile, 'r')
+        currmaprows = []
+        for line in mapfile:        #Creates a list Ids
+            line = json.loads(line)            
+            currmaprows.append(line["Id"])
+        
+        linkchoices = {}
+        recstolink = {}            
+        for classname in linkind:
+            url = "http://localhost:2480/query/" + self.DBname + "/sql/select from " + classname + " where @version = 0"
+            r = requests.get(url,auth=HTTPBasicAuth('admin','admin'))
+            new_recs = json.loads(r.text)["result"]
+            
+            mapid = ""
+            maplinkid = ""
+            mapclassid = ""
+            if classname == "Service":
+                mapid = "ServiceId"
+                maplinkid = "ServiceKey"
+                mapclassid = "Credentials"
+            elif classname == "Credentials":
+                mapid = "ServiceKey"
+                maplinkid = "ServiceId"
+                mapclassid = "Service"
+            elif classname == "Merchant":
+                mapid = "MerchantProfileId"
+                maplinkid = "ServiceId"
+                mapclassid = "Service"
+            elif classname == "Application":
+                mapid = "ApplicationProfileId"
+                maplinkid = "ServiceKey"
+                mapclassid = "Credentials"            
+            
+            url2 = "http://localhost:2480/query/" + self.DBname + "/sql/select from " + mapclassid
+            if mapclassid not in linkchoices.keys():
+                linkchoiceval = []
+                r2 = requests.get(url2,auth=HTTPBasicAuth('admin','admin'))
+                for record in json.loads(r2.text)["result"]:
+                    linkchoiceval.append([record["@rid"],record[maplinkid]])
+                linkchoices[classname] = linkchoiceval  # dict with classname and records appropriate to link to. Ie. ServiceKey:<Records of ServiceId>         
+            
+            recstolinkval = []      
+            for record in new_recs:
+                if record[mapid] not in currmaprows:
+                    recstolinkval.append([record["@rid"],record[mapid]])
+            recstolink[classname] = recstolinkval
+                    
+        self.recstolink = recstolink
+        self.linkchoices = linkchoices               
+            
 
     def createLinkMap(self):        
         mapfile = open(self.MapFile, 'r')    #Creates hashmap for data relationships - with id and related ids eg. "2601",:["6B2866C8FD500001"]        
@@ -200,12 +264,12 @@ class Database:
             updated = False
             for property in class_resp["properties"]:                
                 if property["type"].find("LINK") != -1 and property["name"] not in record_resp.keys(): #If new row was added in map file, add the links to the record                   
-                    if property["type"].find("LIST") != -1:
+                    if property["type"].find("LIST") != -1 and type(RelatedRecords) is str:
                         record_resp[property["name"]] = list([RelatedRecords]) # This is ensuring that when a Service or Credential record has only a single link in the linklist, there is no type error in updating the record
                     else:
                         record_resp[property["name"]] = RelatedRecords
                     updated = True    
-                elif property["type"].find("LINK") != -1 and property["name"] in record_resp.keys(): #If a new link was added to a linklist in mapfile eg: New Service to ServiceKey, or a link was changed eg: changed MerchantProfile to different ServiceKey, add/change those links in record
+                elif property["type"] == "LINKLIST" and property["name"] in record_resp.keys(): #If a new link was added to a linklist in mapfile eg: New Service to ServiceKey, or a link was changed eg: changed MerchantProfile to different ServiceKey, add/change those links in record
                     if set(RelatedRecords) != set(record_resp[property["name"]]) & set(RelatedRecords):
                         record_resp[property["name"]] = RelatedRecords
                         updated = True
