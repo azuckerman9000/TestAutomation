@@ -73,7 +73,7 @@ class GuiFrame(tk.Frame):
     def addRecords(self):
         self.DB.addRecords
         if self.DB.startlinkframe == True:
-            self.mapping_frame = CreateMapRowFrame(self.DB) 
+            self.mapping_frame = CreateMapRowFrame(self.DB)             
             
 class CreateMapRowFrame:
     def __init__(self,DB):
@@ -116,7 +116,8 @@ class CreateMapRowFrame:
         
         self.linkchoices_display = tk.Canvas(self.createmaps_frame,relief=tk.RIDGE,bd=2)
         
-        self.createmaprow_button = tk.Button(self.createmaps_frame,text="Create Map Row")
+        self.createmaprow_button = tk.Button(self.createmaps_frame,text="Create Map Row",state="disabled",command=self.createMapFileRow)
+        self.createmaprow_button.grid(sticky=tk.N,row=2,column=1,columnspan=2)
         
         self.recordstolink_listbox.bind("<ButtonRelease>",self.showRecordsToLink)
         
@@ -126,28 +127,63 @@ class CreateMapRowFrame:
             self.linkchoices_listbox["selectmode"] = tk.MULTIPLE
         else:
             self.linkchoices_listbox["selectmode"] = tk.BROWSE
+        for Id in self.recordstolink_display.find_all():
+            self.recordstolink_display.delete(Id)
         self.recordstolink_display.create_text(0,0,anchor=tk.NW,text=self.DB.getRecord(self.reckey_recordid[selectedrec][1:],0))
         self.recordstolink_display.grid(sticky=tk.N,row=1,column=0,columnspan=2)
+        self.createmaprow_button["state"] = "disabled"
         self.showPossibleLinks(self.reckey_classname[selectedrec])
         
     def showPossibleLinks(self,classname):
+        for Id in self.linkchoices_display.find_all():
+            self.linkchoices_display.delete(Id)
         self.linkchoices_listvar.set("")
         for linkkey in self.classname_linkkeys[classname]:
             self.linkchoices_listvar.set(self.linkchoices_listvar.get() + linkkey + " ")        
         self.linkchoices_listbox.bind("<ButtonRelease>",self.selectChoices)
         
     def selectChoices(self,event):
-        choices = []        
+        self.choices = []        
         if len(event.widget.curselection()) > 1:            
             for index in event.widget.curselection():
-                choices.append(event.widget.get(index))
+                self.choices.append(event.widget.get(index))
         else:
-            choices.append(event.widget.get(event.widget.curselection()[0]))
+            self.choices.append(event.widget.get(event.widget.curselection()[0]))
         text = ""
-        for choice in choices:
-            text = text + self.DB.getRecord(self.linkkey_recordid[choice][1:],0) + "\n"
-        self.linkchoices_display.create_text(0,0,anchor=tk.NW,text=text)
-        self.linkchoices_display.grid(sticky=tk.N,row=1,column=2,columnspan=2)
+        if len(self.choices) >= 1:
+            for choice in self.choices:
+                text = text + self.DB.getRecord(self.linkkey_recordid[choice][1:],0) + "\n"
+            self.linkchoices_display.create_text(0,0,anchor=tk.NW,text=text)
+            self.linkchoices_display.grid(sticky=tk.N,row=1,column=2,columnspan=2)
+            self.createmaprow_button["state"] = "active"
+            
+    def createMapFileRow(self):
+        if len(self.choices) >= 1:
+            rowtemplate = {}
+            selectedrec = self.recordstolink_listbox.get(self.recordstolink_listbox.curselection()[0])
+            rowtemplate["Id"] = selectedrec
+            rowtemplate["@class"] = self.reckey_classname[selectedrec]
+            if self.reckey_classname[selectedrec] == "Service":
+                rowtemplate["Key"] = "Svc"                
+                rowtemplate["MapList"] = list([self.choices])
+            elif self.reckey_classname[selectedrec] == "Credentials":
+                rowtemplate["Key"] = "SK"                
+                rowtemplate["MapList"] = list([self.choices])
+            elif self.reckey_classname[selectedrec] == "Merchant":
+                rowtemplate["Key"] = "Merch"                
+                rowtemplate["MapList"] = self.choices[0]
+            elif self.reckey_classname[selectedrec] == "Application":
+                rowtemplate["Key"] = "App"                
+                rowtemplate["MapList"] = self.choices[0]
+            print(rowtemplate)
+            del self.reckey_classname[selectedrec]
+            if len(self.reckey_classname.keys()) != 0:
+                self.recordstolink_listvar.set("")
+                for reckey in self.reckey_classname.keys():
+                    self.recordstolink_listvar.set(self.recordstolink_listvar.get() + reckey + " ")
+            else:
+                self.createmaps_frame.destroy()
+                self.quit()
                 
 class NewPropertyFrame:
     def __init__(self,frame):        

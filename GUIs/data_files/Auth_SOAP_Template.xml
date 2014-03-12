@@ -41,7 +41,7 @@
      <ns11:DeviceSerialNumber xsi:nil="true" xmlns:ns11="http://schemas.evosnap.com/CWS/v2.0/Transactions"/>
      <ns6:CardData>
       <ns6:CardType>NotSet</ns6:CardType>
-      <ns6:CardholderName></ns6:CardholderName>
+      <ns6:CardholderName>John Doe</ns6:CardholderName>
       <ns6:PAN></ns6:PAN>
       <ns6:Expire></ns6:Expire>
       <ns6:Track1Data xsi:nil="true"/>
@@ -90,7 +90,7 @@
      <ns12:BatchAssignment xsi:nil="true"/>
      <ns12:LaneId xsi:nil="true"/>
      <ns12:ScoreThreshold xsi:nil="true"/>
-     <ns12:TransactionCode>NotSet</ns12:TransactionCode>
+     <ns12:TransactionCode>Override</ns12:TransactionCode>
      <ns1:ManagedBilling xsi:nil="true"/>
      <ns1:Level2Data>
       <ns12:BaseAmount>0.0</ns12:BaseAmount>

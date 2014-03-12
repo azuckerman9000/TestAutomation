@@ -316,13 +316,13 @@ class ViewExistingTests:
     def createWidgets(self):
         self.tcsoap_scroll = tk.Scrollbar(self.tests_frame,orient=tk.VERTICAL)
         self.tcsoap_scroll.grid(sticky=tk.N+tk.S,row=0,column=1)
-        self.tcsoap_listbox = tk.Listbox(self.tests_frame,width=60,listvariable=self.tcsoap_listvar,activestyle="dotbox",yscrollcommand=self.tcsoap_scroll.set)
+        self.tcsoap_listbox = tk.Listbox(self.tests_frame,width=75,listvariable=self.tcsoap_listvar,activestyle="dotbox",yscrollcommand=self.tcsoap_scroll.set)
         self.tcsoap_listbox.grid(sticky=tk.NE,row=0,column=0)
         self.tcsoap_scroll["command"] = self.tcsoap_listbox.yview
         
         self.tcrest_scroll = tk.Scrollbar(self.tests_frame,orient=tk.VERTICAL)
         self.tcrest_scroll.grid(sticky=tk.N+tk.S,row=1,column=1)
-        self.tcrest_listbox = tk.Listbox(self.tests_frame,width=60,listvariable=self.tcrest_listvar,activestyle="dotbox",yscrollcommand=self.tcrest_scroll.set)
+        self.tcrest_listbox = tk.Listbox(self.tests_frame,width=75,listvariable=self.tcrest_listvar,activestyle="dotbox",yscrollcommand=self.tcrest_scroll.set)
         self.tcrest_listbox.grid(sticky=tk.NE,row=1,column=0)
         self.tcrest_scroll["command"] = self.tcrest_listbox.yview
         
@@ -336,11 +336,18 @@ class ViewExistingTests:
             self.displaymap = {}
             for key,val in self.TestCases.items(): #CReates display map of testcase description and info
                 val["TCRecordId"] = key
-                if val["Workflow"] == "None":                
-                    self.displaymap[val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"]] = json.dumps(val,sort_keys=True, indent=2, separators =(',',':'))
-                else:
-                    self.displaymap[val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"] + "-" + val["Workflow"] + " "] = json.dumps(val,sort_keys=True, indent=2, separators =(',',':'))
-            
+                dispstring = val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"]
+                if set([]) !=  set(["3DSecure","AVSData","CVData"]) & set(val.keys()):
+                    for key in list(set(["3DSecure","AVSData","CVData"]) & set(val.keys())):
+                        dispstring = dispstring + "-" + key
+                if "BillPay" in val.keys():
+                    dispstring = dispstring + "-" + "BillPay:" + val["BillPay"]
+                if "Level2" in val.keys():
+                    dispstring = dispstring + "-" + "Level2:" + val["Level2"]
+                if val["Workflow"] != "None":
+                    dispstring = dispstring + "-" + val["Workflow"]
+                self.displaymap[dispstring] = json.dumps(val,sort_keys=True, indent=2, separators =(',',':'))
+                
             restkeys = []
             soapkeys = []
             for key,record in self.displaymap.items():

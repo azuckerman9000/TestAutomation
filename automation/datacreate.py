@@ -270,7 +270,9 @@ class Database:
                         record_resp[property["name"]] = RelatedRecords
                     updated = True    
                 elif property["type"] == "LINKLIST" and property["name"] in record_resp.keys(): #If a new link was added to a linklist in mapfile eg: New Service to ServiceKey, or a link was changed eg: changed MerchantProfile to different ServiceKey, add/change those links in record
-                    if set(RelatedRecords) != set(record_resp[property["name"]]) & set(RelatedRecords):
+                    if type(RelatedRecords) is str:
+                        RelatedRecords = list([RelatedRecords])
+                    if set(RelatedRecords) != set(record_resp[property["name"]]) & set(RelatedRecords):                        
                         record_resp[property["name"]] = RelatedRecords
                         updated = True
                 else:                    

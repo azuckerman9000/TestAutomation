@@ -40,10 +40,10 @@
      <ns3:SwipeStatus xsi:nil="true" />
      <ns3:DeviceSerialNumber xsi:nil="true" />
      <ns4:CardData>
-      <ns4:CardType>Visa</ns4:CardType>
-      <ns4:CardholderName />
+      <ns4:CardType>MasterCard</ns4:CardType>
+      <ns4:CardholderName>John Doe</ns4:CardholderName>
       <ns4:Track1Data xsi:nil="true" />
-      <ns4:Track2Data>4003000123456781=15125025432198712345</ns4:Track2Data>
+      <ns4:Track2Data>5499990123456781=15121015432198712345</ns4:Track2Data>
      </ns4:CardData>
      </ns4:TenderData>
     <ns4:TransactionData xsi:type="ns2:BankcardTransactionDataPro">
@@ -66,7 +66,7 @@
      <ns4:BatchAssignment xsi:nil="true" />
      <ns4:LaneId xsi:nil="true" />
      <ns4:ScoreThreshold xsi:nil="true" />
-     <ns4:TransactionCode>NotSet</ns4:TransactionCode>
+     <ns4:TransactionCode>Override</ns4:TransactionCode>
      <ns2:ManagedBilling xsi:nil="true" />
      <ns2:LineItemDetails xsi:nil="true" />
      <ns2:PINlessDebitData xsi:nil="true" />
@@ -74,8 +74,8 @@
     </ns4:TransactionData>
     </transaction>
    <applicationProfileId>2601</applicationProfileId>
-   <merchantProfileId>Auto_SOAP_Restaurant</merchantProfileId>
-   <workflowId>1257A00001</workflowId>
+   <merchantProfileId>EVO_SOAP_Restaurant_TermCap</merchantProfileId>
+   <workflowId>A77A300001</workflowId>
   </Authorize>
  </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>

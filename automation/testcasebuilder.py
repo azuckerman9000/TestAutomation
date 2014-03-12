@@ -294,7 +294,7 @@ class Transaction:
         for key, value in self.__dict__.items():
             if value != "" and key != "args":
                 TestCaseParams[key] = value
-        for item in list(set(["3DSecure","AVSData","CVData"]) & set(self.args)):
+        for item in list(set(["3DSecure","AVSData","CVData","BillPay","Level2"]) & set(self.args)):
             TestCaseParams[item] = True
             
         self.TestCaseRecordId = ""        
@@ -325,7 +325,11 @@ class Transaction:
         
         if set([]) != set(["3DSecure","AVSData","CVData"]) & set(self.args):
             for item in list(set(["3DSecure","AVSData","CVData"]) & set(self.args)):
-                TestCaseInfo[item] == True
+                TestCaseInfo[item] = True
+        if "BillPay" in self.args:
+            TestCaseInfo["BillPay"] = self.BillPayment
+        if "Level2" in self.args:
+            TestCaseInfo["Level2"] = self.IsTaxExempt
         TopLvlRecords["TestCaseInfo"] = TestCaseInfo
         
         docURL = "http://localhost:2480/document/" + self.DBname
@@ -488,8 +492,7 @@ class MerchantSelectFrame(tk.Frame):
     
     def selectMerchant(self):
         self.rectext = json.loads(self.rectext)
-        print("Selected Merchant: " + self.merch_menuvar.get())
-        self.popup_frame.grid_forget()
+        print("Selected Merchant: " + self.merch_menuvar.get())        
         self.popup_frame.destroy()       
         self.quit()
         

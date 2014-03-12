@@ -1,7 +1,7 @@
 {
   "$type":"AuthorizeTransaction,http://schemas.evosnap.com/CWS/v2.0/Transactions/Rest",
   "ApplicationProfileId":"4084",
-  "MerchantProfileId":"Auto_REST_Retail",
+  "MerchantProfileId":"Auto_REST_Ecommerce",
   "Transaction":{
     "$type":"BankcardTransactionPro,http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard/Pro",
     "Addendum":{
@@ -45,7 +45,8 @@
       "CardData":{
         "CardType":"Visa",
         "CardholderName":"John Doe",
-        "Track2Data":"4003000123456781=15125025432198712345"
+        "Expire":"1215",
+        "PAN":"4003000123456781"
       },
       "DeviceSerialNumber":null,
       "EncryptionKeyId":null,
@@ -57,9 +58,9 @@
       "AccountType":"NotSet",
       "Amount":"1.00",
       "CurrencyCode":"USD",
-      "CustomerPresent":"Present",
-      "EmployeeId":"2",
-      "EntryMode":"TrackDataFromMSR",
+      "CustomerPresent":"Ecommerce",
+      "EmployeeId":"11",
+      "EntryMode":"Keyed",
       "OrderNumber":"5543",
       "Reference":"jdhfjd",
       "TipAmount":"0.0",
