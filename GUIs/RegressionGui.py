@@ -5,6 +5,7 @@ import re
 from requests.auth import HTTPBasicAuth
 from automation import datacreate
 import csv
+import os
 
 
 class RegressionGui(tk.Frame):
@@ -170,11 +171,14 @@ class RegressionGui(tk.Frame):
             self.datadict["TransactionData:CustomerPresent"] = "BillPayment"
             
     def createCSV(self):
-        regrcsv = open("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\RegressionData.csv", "w")
+        data_files = os.chdir('/GUIs/data_files')        
+        DataCSVFile = os.path.abspath(data_files)+"\RegressionData.csv"
+        regrcsv = open(DataCSVFile, "w")
         rowwriter = csv.writer(regrcsv,delimiter=",",lineterminator='\n')
         rowwriter.writerow(list(self.datadict.keys()))
         for row in zip(*list(self.datadict.values())):
             rowwriter.writerow(row)
+        regrcsv.close()
             
        
             

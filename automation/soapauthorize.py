@@ -3,13 +3,16 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 import re
+import os
 
 class SOAPRequest:
     def __init__(self,DBname,TestCaseId):
         self.DBname = DBname
         self.TestCaseId = TestCaseId
-
-        self.AuthTemplate = ET.parse("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\Auth_SOAP_Template.xml")    
+        
+        self.data_files = os.chdir('../GUIs/data_files')        
+        SOAPTemp = os.path.abspath(self.data_files)+"\Auth_SOAP_Template.xml"
+        self.AuthTemplate = ET.parse(SOAPTemp)    
         self.root = self.AuthTemplate.getroot()    
         #TenderData = self.root[0][0][1][4]
         #CardData = self.root[0][0][1][4][5]
@@ -28,7 +31,8 @@ class SOAPRequest:
         self.setInterchangeRequestObject()        
         ET.register_namespace("SOAP-ENV","http://schemas.xmlsoap.org/soap/envelope/")
         
-        self.AuthTemplate.write("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\AuthSOAP_Request.xml")
+        SOAPReq = os.path.abspath(self.data_files)+"\AuthSOAP_Request.xml"
+        self.AuthTemplate.write(SOAPReq)
         self.handleNamespaces()
         self.setParasoftVars()
     
@@ -173,7 +177,8 @@ class SOAPRequest:
                 InterchangeNode.remove(self.getChildNode(InterchangeNode,"TotalNumberOfInstallments"))
             
     def handleNamespaces(self):
-        newfile = open("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\AuthSOAP_Request.xml", 'r+')        
+        AuthReq = os.path.abspath(self.data_files)+"\AuthSOAP_Request.xml"
+        newfile = open(AuthReq, 'r+')        
         NewLineList = newfile.readlines()
         newfile.seek(0,0)        
         NewLineList[0] = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard/Pro" xmlns:ns3="http://schemas.evosnap.com/CWS/v2.0/Transactions" xmlns:ns4="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n'
@@ -191,7 +196,8 @@ class SOAPRequest:
         newfile.close()
         
     def setParasoftVars(self):
-        varfile = open("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\IdentityToken.csv", 'w')
+        IdtFile = os.path.abspath(self.data_files)+"\IdentityToken.csv"
+        varfile = open(IdtFile, 'w')
         
         varfile.write("MessageType,IdentityToken\n")
                

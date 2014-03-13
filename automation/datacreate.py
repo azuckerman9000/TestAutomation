@@ -3,6 +3,7 @@ import requests
 import re
 from requests.auth import HTTPBasicAuth
 import sys
+import os
 
 
 class Database:
@@ -21,11 +22,12 @@ class Database:
             else:
                 continue
         print(self.ClassNames)        
-            
-        self.RecordFile = "C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\DataPop.txt"
-        self.PropertyFile = "C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\class_Properties.txt"
-        self.NewRecordFile = "C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\NewRecords.txt"
-        self.MapFile = "C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\MappingData.txt"
+        
+        data_files = os.chdir('../GUIs/data_files')        
+        self.RecordFile = os.path.abspath(data_files)+"\DataPop.txt"
+        self.PropertyFile = os.path.abspath(data_files)+"\class_Properties.txt"
+        self.NewRecordFile = os.path.abspath(data_files)+"\\NewRecords.txt"
+        self.MapFile = os.path.abspath(data_files)+"\MappingData.txt"        
         self.DataExists = {} #Map of Class names with number of records for each class before adding new records
         self.LinkMap = {} #Map of Top Level RecordIds with related linked RecordIds        
     

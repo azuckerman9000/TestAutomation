@@ -4,6 +4,7 @@ from automation import restjsonauthorize
 import tkinter as tk
 import re
 import json
+import os
 
 
 class TCBuildGui(tk.Frame):
@@ -446,7 +447,9 @@ class SaveMerchantProfileFrame:
     def saveMerchantProfile(self):
         if self.merchselect_menuvar.get() != "":
             info = self.merchinfo[self.merchselect_menuvar.get()]
-            merchdata = open("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\MerchantData.csv", 'w')
+            data_files = os.chdir('/GUIs/data_files')        
+            merchfile = os.path.abspath(data_files)+"\MerchantData.csv"
+            merchdata = open(merchfile, 'w')
             merchdata.write("SaveInd,MessageType,MerchantProfileId,IndustryType,MID,TID,ServiceId,EntryMode,CustomerPresent,IdentityToken\n")
             merchdata.write("1,"+ info["MessageType"] + "," + info["MerchantProfileId"] + "," + info["IndustryType"] + "," + info["MID"] + "," +info["TID"] + "," +info["ServiceId"] + "," + info["EntryMode"] + "," + info["CustomerPresent"] + "," + self.merchidt[info["MerchantProfileId"]])
             merchdata.close()

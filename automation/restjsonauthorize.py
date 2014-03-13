@@ -1,12 +1,15 @@
 import json
 import requests
 from requests.auth import HTTPBasicAuth
+import os
 
 class RestJsonRequest:
     def __init__(self,DBname,TestCaseId):
         self.DBname = DBname
         self.TestCaseId = TestCaseId
-        self.json_file = open("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\Auth_RestJson_Template.json", "r")        
+        self.data_files = os.chdir('../GUIs/data_files')        
+        JsonTemp = os.path.abspath(self.data_files)+"\Auth_RestJson_Template.json"
+        self.json_file = open(JsonTemp, "r")        
         self.json_template = json.loads(self.json_file.read())
         self.json_file.close()
         
@@ -17,7 +20,8 @@ class RestJsonRequest:
         self.setLevel2RequestObject()
         self.setInterchangeRequestObject()
         
-        self.RestJsonAuthReq = open("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\AuthRestJson_Request.json", "w")
+        JsonReq = os.path.abspath(self.data_files)+"\AuthRestJson_Request.json"
+        self.RestJsonAuthReq = open(JsonReq, "w")
         self.RestJsonAuthReq.write(json.dumps(self.json_template,sort_keys=True, indent=2, separators =(',',':')))
         
         self.RestJsonAuthReq.close()
@@ -134,7 +138,8 @@ class RestJsonRequest:
                 del self.json_template["Transaction"]["InterchangeData"]["TotalNumberOfInstallments"]
                 
     def setParasoftVars(self):
-        varfile = open("C:\\Users\\alanz\\SOATest\\pythontest\\GUIs\\data_files\\IdentityToken.csv", 'w')
+        IdtFile = os.path.abspath(self.data_files)+"\IdentityToken.csv"
+        varfile = open(IdtFile, 'w')
         
         varfile.write("MessageType,IdentityToken,ServiceId\n")
                
