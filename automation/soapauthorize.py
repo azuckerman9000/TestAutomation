@@ -10,8 +10,8 @@ class SOAPRequest:
         self.DBname = DBname
         self.TestCaseId = TestCaseId
         
-        self.data_files = os.chdir('../GUIs/data_files')        
-        SOAPTemp = os.path.abspath(self.data_files)+"\Auth_SOAP_Template.xml"
+        self.data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')
+        SOAPTemp = os.path.abspath(os.path.join(self.data_files,"Auth_SOAP_Template.xml"))        
         self.AuthTemplate = ET.parse(SOAPTemp)    
         self.root = self.AuthTemplate.getroot()    
         #TenderData = self.root[0][0][1][4]
@@ -31,7 +31,7 @@ class SOAPRequest:
         self.setInterchangeRequestObject()        
         ET.register_namespace("SOAP-ENV","http://schemas.xmlsoap.org/soap/envelope/")
         
-        SOAPReq = os.path.abspath(self.data_files)+"\AuthSOAP_Request.xml"
+        SOAPReq = os.path.abspath(os.path.join(self.data_files,"AuthSOAP_Request.xml"))        
         self.AuthTemplate.write(SOAPReq)
         self.handleNamespaces()
         self.setParasoftVars()
@@ -177,7 +177,7 @@ class SOAPRequest:
                 InterchangeNode.remove(self.getChildNode(InterchangeNode,"TotalNumberOfInstallments"))
             
     def handleNamespaces(self):
-        AuthReq = os.path.abspath(self.data_files)+"\AuthSOAP_Request.xml"
+        AuthReq = os.path.abspath(os.path.join(self.data_files,"AuthSOAP_Request.xml"))        
         newfile = open(AuthReq, 'r+')        
         NewLineList = newfile.readlines()
         newfile.seek(0,0)        
@@ -196,16 +196,16 @@ class SOAPRequest:
         newfile.close()
         
     def setParasoftVars(self):
-        IdtFile = os.path.abspath(self.data_files)+"\IdentityToken.csv"
+        IdtFile = os.path.abspath(os.path.join(self.data_files,"IdentityToken.csv"))        
         varfile = open(IdtFile, 'w')
         
-        varfile.write("MessageType,IdentityToken\n")
+        varfile.write("MessageType,Environment,IdentityToken\n")
                
         line2 = ""
         if self.TestCaseInfo["MessageType"] == "SOAP":
-            line2 = "SOAP,"+ self.HighLevelData["Credentials"]["IdentityToken"]
+            line2 = "SOAP,"+ self.TestCaseInfo["Environment"] + "," + self.HighLevelData["Credentials"]["IdentityToken"]
         elif self.TestCaseInfo["MessageType"] == "REST":
-            line2 = "REST," + self.HighLevelData["Credentials"]["IdentityToken"]
+            line2 = "REST," + self.TestCaseInfo["Environment"] + "," + self.HighLevelData["Credentials"]["IdentityToken"]
         
         varfile.write(line2)                   
         varfile.close()

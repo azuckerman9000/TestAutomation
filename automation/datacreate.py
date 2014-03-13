@@ -23,11 +23,12 @@ class Database:
                 continue
         print(self.ClassNames)        
         
-        data_files = os.chdir('../GUIs/data_files')        
-        self.RecordFile = os.path.abspath(data_files)+"\DataPop.txt"
-        self.PropertyFile = os.path.abspath(data_files)+"\class_Properties.txt"
-        self.NewRecordFile = os.path.abspath(data_files)+"\\NewRecords.txt"
-        self.MapFile = os.path.abspath(data_files)+"\MappingData.txt"        
+        data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')
+        self.RecordFile = os.path.abspath(os.path.join(data_files,"DataPop.txt"))
+        self.PropertyFile = os.path.abspath(os.path.join(data_files,"class_Properties.txt"))
+        self.NewRecordFile = os.path.abspath(os.path.join(data_files,"NewRecords.txt"))
+        self.MapFile = os.path.abspath(os.path.join(data_files,"MappingData.txt"))        
+              
         self.DataExists = {} #Map of Class names with number of records for each class before adding new records
         self.LinkMap = {} #Map of Top Level RecordIds with related linked RecordIds        
     

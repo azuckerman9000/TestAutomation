@@ -171,8 +171,8 @@ class RegressionGui(tk.Frame):
             self.datadict["TransactionData:CustomerPresent"] = "BillPayment"
             
     def createCSV(self):
-        data_files = os.chdir('/GUIs/data_files')        
-        DataCSVFile = os.path.abspath(data_files)+"\RegressionData.csv"
+        data_files = os.path.join(os.path.dirname( __file__ ), 'data_files')
+        DataCSVFile = os.path.abspath(os.path.join(data_files,"RegressionData.csv"))        
         regrcsv = open(DataCSVFile, "w")
         rowwriter = csv.writer(regrcsv,delimiter=",",lineterminator='\n')
         rowwriter.writerow(list(self.datadict.keys()))

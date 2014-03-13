@@ -447,11 +447,11 @@ class SaveMerchantProfileFrame:
     def saveMerchantProfile(self):
         if self.merchselect_menuvar.get() != "":
             info = self.merchinfo[self.merchselect_menuvar.get()]
-            data_files = os.chdir('/GUIs/data_files')        
-            merchfile = os.path.abspath(data_files)+"\MerchantData.csv"
+            data_files = os.path.join(os.path.dirname( __file__ ), 'data_files')
+            merchfile = os.path.abspath(os.path.join(data_files,"MerchantData.csv"))            
             merchdata = open(merchfile, 'w')
-            merchdata.write("SaveInd,MessageType,MerchantProfileId,IndustryType,MID,TID,ServiceId,EntryMode,CustomerPresent,IdentityToken\n")
-            merchdata.write("1,"+ info["MessageType"] + "," + info["MerchantProfileId"] + "," + info["IndustryType"] + "," + info["MID"] + "," +info["TID"] + "," +info["ServiceId"] + "," + info["EntryMode"] + "," + info["CustomerPresent"] + "," + self.merchidt[info["MerchantProfileId"]])
+            merchdata.write("SaveInd,MessageType,Environment,MerchantProfileId,IndustryType,MID,TID,ServiceId,EntryMode,CustomerPresent,IdentityToken\n")
+            merchdata.write("1,"+ info["MessageType"] + "," + info["Environment"] + "," + info["MerchantProfileId"] + "," + info["IndustryType"] + "," + info["MID"] + "," +info["TID"] + "," +info["ServiceId"] + "," + info["EntryMode"] + "," + info["CustomerPresent"] + "," + self.merchidt[info["MerchantProfileId"]])
             merchdata.close()
             self.merchsave_messagevar.set("Save Merchant Profile: " + info["MerchantProfileId"] + ", added to test run.")
         

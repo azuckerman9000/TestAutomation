@@ -7,8 +7,10 @@ class RestJsonRequest:
     def __init__(self,DBname,TestCaseId):
         self.DBname = DBname
         self.TestCaseId = TestCaseId
-        self.data_files = os.chdir('../GUIs/data_files')        
-        JsonTemp = os.path.abspath(self.data_files)+"\Auth_RestJson_Template.json"
+        
+        self.data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')
+        JsonTemp = os.path.abspath(os.path.join(self.data_files,"Auth_RestJson_Template.json")) 
+        
         self.json_file = open(JsonTemp, "r")        
         self.json_template = json.loads(self.json_file.read())
         self.json_file.close()
@@ -20,7 +22,7 @@ class RestJsonRequest:
         self.setLevel2RequestObject()
         self.setInterchangeRequestObject()
         
-        JsonReq = os.path.abspath(self.data_files)+"\AuthRestJson_Request.json"
+        JsonReq = os.path.abspath(os.path.join(self.data_files,"AuthRestJson_Request.json"))        
         self.RestJsonAuthReq = open(JsonReq, "w")
         self.RestJsonAuthReq.write(json.dumps(self.json_template,sort_keys=True, indent=2, separators =(',',':')))
         
@@ -138,16 +140,16 @@ class RestJsonRequest:
                 del self.json_template["Transaction"]["InterchangeData"]["TotalNumberOfInstallments"]
                 
     def setParasoftVars(self):
-        IdtFile = os.path.abspath(self.data_files)+"\IdentityToken.csv"
+        IdtFile = os.path.abspath(os.path.join(self.data_files,"IdentityToken.csv"))        
         varfile = open(IdtFile, 'w')
         
-        varfile.write("MessageType,IdentityToken,ServiceId\n")
+        varfile.write("MessageType,Environment,IdentityToken,ServiceId\n")
                
         line2 = ""
         if self.TestCaseInfo["MessageType"] == "SOAP":
-            line2 = "SOAP,"+ self.HighLevelData["Credentials"]["IdentityToken"] +"," + self.HighLevelData["Service"]["ServiceId"]
+            line2 = "SOAP,"+ self.TestCaseInfo["Environment"] + "," + self.HighLevelData["Credentials"]["IdentityToken"] +"," + self.HighLevelData["Service"]["ServiceId"]
         elif self.TestCaseInfo["MessageType"] == "REST":
-            line2 = "REST," + self.HighLevelData["Credentials"]["IdentityToken"] +"," + self.HighLevelData["Service"]["ServiceId"]
+            line2 = "REST," + self.TestCaseInfo["Environment"] + "," + self.HighLevelData["Credentials"]["IdentityToken"] +"," + self.HighLevelData["Service"]["ServiceId"]
         
         varfile.write(line2)                   
         varfile.close()
