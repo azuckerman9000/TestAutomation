@@ -126,9 +126,7 @@ class Database:
                 if File == self.RecordFile and self.DataExists[linegroup[0]] == 0:                
                     payload = linegroup[1]        
                     r2 = requests.post(docURL, data=payload, headers=headers, auth=HTTPBasicAuth('admin','admin'))
-                    print("Record of class " + linegroup[0] + " added to database")
-                    if linegroup[0] not in linkind and linegroup[0] in ["Service","Credentials","Merchant","Application"]:
-                        linkind.append(linegroup[0]) 
+                    print("Record of class " + linegroup[0] + " added to database")                     
                 elif File == self.NewRecordFile:    
                     masterfile = open(self.RecordFile, 'a', encoding="utf-8")
                     payload = linegroup[1]    
@@ -148,8 +146,8 @@ class Database:
         datafile.close()
         
         if len(linkind) > 0:
-            self.addMapRows(linkind)
             self.startlinkframe = True
+            self.addMapRows(linkind)            
         else:
             self.startlinkframe = False
             
@@ -353,7 +351,7 @@ class Database:
                         del record[key]
                     del record["@type"]                    
                     del record["@version"]                               
-                    datafile.write(classname + "|" + json.dumps(record) + '\n')
+                    datafile.write(classname + "|" + json.dumps(record) + "\n")
         datafile.close()            
             
     def populateData(self):

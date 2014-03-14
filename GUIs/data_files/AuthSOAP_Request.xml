@@ -40,19 +40,12 @@
      <ns3:SwipeStatus xsi:nil="true" />
      <ns3:DeviceSerialNumber xsi:nil="true" />
      <ns4:CardData>
-      <ns4:CardType>Visa</ns4:CardType>
+      <ns4:CardType>MasterCard</ns4:CardType>
       <ns4:CardholderName>John Doe</ns4:CardholderName>
-      <ns4:PAN>4003000123456781</ns4:PAN>
+      <ns4:PAN>5499990123456781</ns4:PAN>
       <ns4:Expire>1215</ns4:Expire>
       <ns4:Track1Data xsi:nil="true" />
       </ns4:CardData>
-     <ns4:CardSecurityData>
-      <ns4:CVDataProvided>Provided</ns4:CVDataProvided>
-      <ns4:CVData>123</ns4:CVData>
-      <ns4:KeySerialNumber />
-      <ns4:PIN />
-      <ns4:IdentificationInformation xsi:nil="true" />
-     </ns4:CardSecurityData>
      </ns4:TenderData>
     <ns4:TransactionData xsi:type="ns2:BankcardTransactionDataPro">
      <ns3:Amount>1.00</ns3:Amount>
@@ -82,8 +75,8 @@
     </ns4:TransactionData>
     </transaction>
    <applicationProfileId>2601</applicationProfileId>
-   <merchantProfileId>EVO_SOAP_Ecommerce_HostCap</merchantProfileId>
-   <workflowId>911C800001</workflowId>
+   <merchantProfileId>EVO_SOAP_Ecommerce_TermCap</merchantProfileId>
+   <workflowId>A77A300001</workflowId>
   </Authorize>
  </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>

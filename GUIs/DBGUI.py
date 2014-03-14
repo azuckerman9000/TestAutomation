@@ -71,18 +71,19 @@ class GuiFrame(tk.Frame):
         self.viewrec_frame.populateMenus()
         
     def addRecords(self):
-        self.DB.addRecords
+        self.DB.addRecords()
         if self.DB.startlinkframe == True:
-            self.mapping_frame = CreateMapRowFrame(self.DB)             
+            self.mapping_frame = CreateMapRowFrame(self.DB)
+            self.mapping_frame.mainloop()             
             
-class CreateMapRowFrame:
-    def __init__(self,DB):
+class CreateMapRowFrame(tk.Frame):
+    def __init__(self,master,DB):
+        tk.Frame.__init__(self, master=None)
+        self.grid()
         self.createmaps_frame = tk.Toplevel(height=400,width=400)
         self.createmaps_frame.grid()
-        self.createVariables()
-        self.createWidgets()
-        self.DB = DB               
         
+        self.DB = DB        
         for classname, val in self.DB.recstolink:
             self.reckey_classname[val[1]] = classname
             self.reckey_recordid[val[1]] = val[0]
@@ -90,7 +91,10 @@ class CreateMapRowFrame:
         for classname, val in self.DB.linkchoices:
             self.linkkey_classname[val[1]] = classname
             self.linkkey_recordid[val[1]] = val[0]
-            self.classname_linkkeys[classname].append(val[1])        
+            self.classname_linkkeys[classname].append(val[1])
+            
+        self.createVariables()
+        self.createWidgets()        
         
     def createVariables(self):
         self.recordstolink_listvar = tk.StringVar()
@@ -156,6 +160,8 @@ class CreateMapRowFrame:
             self.linkchoices_display.create_text(0,0,anchor=tk.NW,text=text)
             self.linkchoices_display.grid(sticky=tk.N,row=1,column=2,columnspan=2)
             self.createmaprow_button["state"] = "active"
+        else:
+            self.createmaprow_button["state"] = "disabled"
             
     def createMapFileRow(self):
         if len(self.choices) >= 1:

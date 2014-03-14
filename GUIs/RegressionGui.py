@@ -178,16 +178,7 @@ class RegressionGui(tk.Frame):
         rowwriter.writerow(list(self.datadict.keys()))
         for row in zip(*list(self.datadict.values())):
             rowwriter.writerow(row)
-        regrcsv.close()
-            
-       
-            
-         
-                
-        
-                    
-            
-              
+        regrcsv.close()              
 
 regframe = RegressionGui()
 regframe.master.title("Regression Plan")
