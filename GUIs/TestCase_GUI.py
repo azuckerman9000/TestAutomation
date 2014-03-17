@@ -347,6 +347,8 @@ class ViewExistingTests:
                     dispstring = dispstring + "-" + "Level2:" + val["Level2"]
                 if val["Workflow"] != "None":
                     dispstring = dispstring + "-" + val["Workflow"]
+                if val["TenderType"] == "PINDebit":
+                    dispstring = dispstring + "-PINDebit" 
                 self.displaymap[dispstring] = json.dumps(val,sort_keys=True, indent=2, separators =(',',':'))
                 
             restkeys = []
