@@ -1,5 +1,4 @@
 import tkinter as tk
-from automation import tmsquerybuilder
 
 class TMSQueryGui(tk.Frame):
     def __init__(self,master=None):
@@ -21,15 +20,15 @@ class TMSQueryGui(tk.Frame):
         self.tmsop_menubutton.grid(row=0,column=0)
         self.tmsop_menu = tk.Menu(self.tmsop_menubutton)
         self.tmsop_menubutton["menu"] = self.tmsop_menu
-        for item in ["QueryTransactionsSummary","QueryTransactionsFamily","QueryTransactionsDetail","QueryBatch"]:
-            self.tmsop_menu.add_checkbutton(label=item,onvalue=item,variable=self.tmsop_menuitemvar,command=self.openParamFrame)
+    #    for item in ["QueryTransactionsSummary","QueryTransactionsFamily","QueryTransactionsDetail","QueryBatch"]:
+    #        self.tmsop_menu.add_checkbutton(label=item,onvalue=item,variable=self.tmsop_menuitemvar,command=self.openParamFrame)
             
-    def openParamFrame(self):
-        self.tmsop_menubuttonvar.set(self.tmsop_menuitemvar.get())
-        if self.tmsop_menuitemvar.get() != "QueryBatch" and self.tmsop_menuitemvar.get() != "":
-            self.param_frame = TxnParamFrame(self.main_frame,self.tmsop_menuitemvar.get())            
-        elif self.tmsop_menuitemvar.get() == "QueryBatch":
-            self.param_frame = BatchParamFrame(self.main_frame,self.tmsop_menuitemvar.get())            
+    #def openParamFrame(self):
+    #    self.tmsop_menubuttonvar.set(self.tmsop_menuitemvar.get())
+    #    if self.tmsop_menuitemvar.get() != "QueryBatch" and self.tmsop_menuitemvar.get() != "":
+    #        self.param_frame = TxnParamFrame(self.main_frame,self.tmsop_menuitemvar.get())            
+    #    elif self.tmsop_menuitemvar.get() == "QueryBatch":
+    #        self.param_frame = BatchParamFrame(self.main_frame,self.tmsop_menuitemvar.get())            
         
 class TxnParamFrame:
     def __init__(self,frame,queryname):
@@ -42,7 +41,7 @@ class TxnParamFrame:
         self.createListBoxes()
         self.createOtherWidgets()
         if queryname == "QueryTransactionsDetail":
-            self.createDetailFormat()
+            self.createDetailFormat()        
         
     def createVariables(self):
         self.amounts_var = tk.StringVar()
@@ -73,6 +72,7 @@ class TxnParamFrame:
         
         self.querytype_var = tk.StringVar()        
         self.includereltd_var = tk.StringVar()
+        self.query_messagevar = tk.StringVar()
         
     def createLabels(self):
         self.txnparam_label = tk.Label(self.txn_frame,text="Query Transactions Parameters:",relief=tk.GROOVE,pady=4)
@@ -131,13 +131,13 @@ class TxnParamFrame:
         
     def createListBoxes(self):
         self.capturestates_listvar.set("NotSet CannotCapture ReadyForCapture CapturePending Captured CaptureDeclined InProcess CapturedUndoPermitted CapturedPendingUndoPermitted CaptureError CaptureUnknown BatchSent BatchSentUndoPermitted")
-        self.capturestates_listbox = tk.Listbox(self.txn_frame,listvariable=self.capturestates_listvar,selectmode=tk.MULTIPLE,width=40,height=13)
+        self.capturestates_listbox = tk.Listbox(self.txn_frame,listvariable=self.capturestates_listvar,selectmode=tk.MULTIPLE,width=40,height=13,exportselection=0)
         self.capturestates_listbox.grid(sticky=tk.W,row=9,column=1,rowspan=2)
         self.cardtypes_listvar.set("Visa MasterCard Discover AmericanExpress")
-        self.cardtypes_listbox = tk.Listbox(self.txn_frame,listvariable=self.cardtypes_listvar,selectmode=tk.MULTIPLE,width=40,height=4)
+        self.cardtypes_listbox = tk.Listbox(self.txn_frame,listvariable=self.cardtypes_listvar,selectmode=tk.MULTIPLE,width=40,height=4,exportselection=0)
         self.cardtypes_listbox.grid(sticky=tk.W,row=11,column=1,rowspan=2)
         self.txnstates_listvar.set("NotSet Declined Verified Authorized Adjusted Captured CaptureDeclined PartiallyCaptured Undone ReturnRequested PartialReturnRequested ReturnUndone Returned PartiallyReturned InProcess ErrorValidation ErrorUnknown")
-        self.txnstates_listbox = tk.Listbox(self.txn_frame,listvariable=self.txnstates_listvar,selectmode=tk.MULTIPLE,width=40,height=17)
+        self.txnstates_listbox = tk.Listbox(self.txn_frame,listvariable=self.txnstates_listvar,selectmode=tk.MULTIPLE,width=40,height=17,exportselection=0)
         self.txnstates_listbox.grid(sticky=tk.W,row=13,column=1,rowspan=2)
         
     def createOtherWidgets(self):
@@ -145,14 +145,14 @@ class TxnParamFrame:
         self.txntimestart_menubutton.grid(row=2,column=2)
         self.txntimestart_menu = tk.Menu(self.txntimestart_menubutton)
         self.txntimestart_menubutton["menu"] = self.txntimestart_menu
-        for item in ["One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago","One Month Ago"]:
-            self.txntimestart_menu.add_checkbutton(label=item,onvalue=item,variable=self.txntimestart_menuitemvar,offvalue="")
+        #for item in ["One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago","One Month Ago"]:
+        #    self.txntimestart_menu.add_checkbutton(label=item,onvalue=item,variable=self.txntimestart_menuitemvar,offvalue="")        
         self.txntimeend_menubutton = tk.Menubutton(self.txn_frame,textvariable=self.txntimeend_menubuttonvar,relief="raised")
         self.txntimeend_menubutton.grid(row=2,column=3)
         self.txntimeend_menu = tk.Menu(self.txntimeend_menubutton)
-        self.txntimeend_menubutton["menu"] = self.txntimeend_menu
-        for item in ["Now","One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago"]:
-            self.txntimeend_menu.add_checkbutton(label=item,onvalue=item,variable=self.txntimeend_menuitemvar,offvalue="")
+        self.txntimeend_menubutton["menu"] = self.txntimeend_menu        
+        #for item in ["Now","One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago"]:
+        #    self.txntimeend_menu.add_checkbutton(label=item,onvalue=item,variable=self.txntimeend_menuitemvar,offvalue="")
             
         self.capturetimestart_menubutton = tk.Menubutton(self.txn_frame,textvariable=self.capturetimestart_menubuttonvar,relief="raised")
         self.capturetimestart_menubutton.grid(row=4,column=2)
@@ -165,7 +165,7 @@ class TxnParamFrame:
         
         self.querytypeor_radio = tk.Radiobutton(self.txn_frame,value="OR",variable=self.querytype_var,text="OR")
         self.querytypeor_radio.grid(row=9,column=2)        
-        self.querytypeand_radio = tk.Radiobutton(self.txn_frame,value="AND",variable=self.querytype_var,text="AND",indicatoron=1)
+        self.querytypeand_radio = tk.Radiobutton(self.txn_frame,value="AND",variable=self.querytype_var,text="AND")
         self.querytypeand_radio.grid(row=9,column=3)
         self.querytypeand_radio.select()
         
@@ -176,7 +176,10 @@ class TxnParamFrame:
         self.includereltdfalse_radio.grid(row=10,column=3)
         
         self.createquery_button = tk.Button(self.txn_frame,text="Create TMS Query")
-        self.createquery_button.grid(row=13,column=2,columnspan=2)           
+        self.createquery_button.grid(sticky=tk.N,row=13,column=2,columnspan=2) 
+        
+        self.query_message = tk.Message(self.txn_frame,textvariable=self.query_messagevar,aspect=600)
+        self.query_message.grid(row=13,column=2,columnspan=2)          
                 
     def createDetailFormat(self):
         self.txndetlfrmt_var = tk.StringVar()
@@ -188,18 +191,17 @@ class TxnParamFrame:
         self.txndetlfrmttxn_radio.grid(sticky=tk.S,row=11,column=2)
         self.txndetlfrmttxn_radio.select()
         self.txndetlfrmtsrl_radio = tk.Radiobutton(self.txn_frame,value="SerializedCWS",variable=self.txndetlfrmt_var,text="Serialized CWS")
-        self.txndetlfrmtsrl_radio.grid(sticky=tk.S,row=11,column=3) 
-        
-        
-        
-        
-        
+        self.txndetlfrmtsrl_radio.grid(sticky=tk.S,row=11,column=3)
         
 class BatchParamFrame:
     def __init__(self,frame):
         self.batch_frame = tk.Frame(frame)
+        
+
+        
+        
     
         
-gui = TMSQueryGui()
-gui.master.title("TMS Queries")
-gui.mainloop()
+#gui = TMSQueryGui()
+#gui.master.title("TMS Queries")
+#gui.mainloop()
