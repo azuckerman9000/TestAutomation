@@ -91,6 +91,8 @@ class TCBuildGui(tk.Frame):
         self.card_menuvar = tk.StringVar()
         self.card_menuvar.set("CardType")
         self.card_menuitemvar = tk.StringVar()
+        
+        self.andcapture_var = tk.IntVar()
     
     def createMenus(self):
         self.db_entry = tk.Entry(self.build_frame, textvariable=self.db_var)
@@ -207,19 +209,22 @@ class TCBuildGui(tk.Frame):
         self.optionals.createWidgets()            
             
     def createSOAPReqButton(self):
-        self.soapreq_button = tk.Button(self,text="Create SOAP Request",state="disabled")#,command=lambda: self.createSOAPReq(self.db_var.get(),self.tc.TestCaseRecordId[1:]))
+        self.soapreq_button = tk.Button(self,text="Create SOAP Authorize",state="disabled")#,command=lambda: self.createSOAPReq(self.db_var.get(),self.tc.TestCaseRecordId[1:]))
         self.soapreq_button.grid(sticky=tk.N,row=4,column=0,columnspan=3)
         
         self.soapreq_messagevar = tk.StringVar()
         self.soapreq_message = tk.Message(self,textvariable=self.soapreq_messagevar, aspect=800)
         self.soapreq_message.grid(sticky=tk.NW,row=4,column=3)
         
+        self.andcapture_button = tk.Checkbutton(self,text="AndCapture",variable=self.andcapture_var,onvalue=1,offvalue=0)
+        self.andcapture_button.grid(row=4,column=2,rowspan=2)
+        
     def createSOAPReq(self,DBname,RecordId):
-        req = soapauthorize.SOAPRequest(DBname,RecordId)
+        req = soapauthorize.SOAPRequest(DBname,RecordId,self.andcapture_var.get())
         self.soapreq_messagevar.set("SOAP Request Created for TestCase record = " + RecordId)
         
     def createRESTReqButton(self):
-        self.restreq_button = tk.Button(self,text="Create REST Request",state="disabled")#,command=lambda: self.createrestReq(self.db_var.get(),self.tc.TestCaseRecordId[1:]))
+        self.restreq_button = tk.Button(self,text="Create REST Authorize",state="disabled")#,command=lambda: self.createrestReq(self.db_var.get(),self.tc.TestCaseRecordId[1:]))
         self.restreq_button.grid(sticky=tk.N,row=5,column=0,columnspan=3)
         
         self.restreq_messagevar = tk.StringVar()
@@ -227,7 +232,7 @@ class TCBuildGui(tk.Frame):
         self.restreq_message.grid(sticky=tk.NW,row=5,column=3)
         
     def createRESTReq(self,DBname,RecordId):
-        req = restjsonauthorize.RestJsonRequest(DBname,RecordId)
+        req = restjsonauthorize.RestJsonRequest(DBname,RecordId,self.andcapture_var.get())
         self.restreq_messagevar.set("REST Request Created for TestCase record = " + RecordId)
 
 class OptionalArgsFrame:

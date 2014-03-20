@@ -6,9 +6,10 @@ import re
 import os
 
 class SOAPRequest:
-    def __init__(self,DBname,TestCaseId):
+    def __init__(self,DBname,TestCaseId,AndCapInd):
         self.DBname = DBname
         self.TestCaseId = TestCaseId
+        self.AndCapInd = AndCapInd
         
         self.data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')
         SOAPTemp = os.path.abspath(os.path.join(self.data_files,"Auth_SOAP_Template.xml"))        
@@ -182,7 +183,10 @@ class SOAPRequest:
         NewLineList = newfile.readlines()
         newfile.seek(0,0)        
         NewLineList[0] = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard/Pro" xmlns:ns3="http://schemas.evosnap.com/CWS/v2.0/Transactions" xmlns:ns4="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n'
-        NewLineList[2] = '<Authorize xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">\n'
+        if self.AndCapInd == 0:
+            NewLineList[2] = '<Authorize xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">\n'
+        else:
+            NewLineList[2] = '<AuthorizeAndCapture xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">\n'
         NewLineList[3] = '<sessionToken>${Test 1: SignOnWithTokenResult}</sessionToken>\n'
         NewLineList[4] = '<transaction xsi:type="ns2:BankcardTransactionPro">\n'
         for line in NewLineList:

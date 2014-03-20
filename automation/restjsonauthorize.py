@@ -4,7 +4,7 @@ from requests.auth import HTTPBasicAuth
 import os
 
 class RestJsonRequest:
-    def __init__(self,DBname,TestCaseId):
+    def __init__(self,DBname,TestCaseId,AndCapInd):
         self.DBname = DBname
         self.TestCaseId = TestCaseId
         
@@ -14,6 +14,9 @@ class RestJsonRequest:
         self.json_file = open(JsonTemp, "r")        
         self.json_template = json.loads(self.json_file.read())
         self.json_file.close()
+        
+        if AndCapInd != 0:
+            self.json_template["$type"] = "AuthorizeAndCaptureTransaction,http://schemas.evosnap.com/CWS/v2.0/Transactions/Rest"
         
         self.getTestCaseData()
         self.setHighLevelData()

@@ -90,7 +90,7 @@ class Transaction:
         
         possiblemerchants = {}
         for record in merch_resp["result"]:
-            if self.IndustryType == record["IndustryType"] and self.ServiceRecordId == record["ServiceId"]:
+            if self.IndustryType == record["IndustryType"] and self.ServiceRecordId == record["ServiceId"] and self.MessageType == record["MessageType"]:
                 possiblemerchants[record["MerchantProfileId"]] = record["@rid"]
         if len(possiblemerchants.keys()) > 1:
             possiblemerchants["DBname"] = self.DBname            
@@ -368,7 +368,7 @@ class Transaction:
             r2 = requests.get(docURL + record["ServiceId"][1:] + "/*:1", auth=HTTPBasicAuth('admin','admin'))
             svc_resp = json.loads(r2.text)
             for skey in svc_resp["ServiceKey"]:
-                if skey["MessageType"] == record["MessageType"]:
+                if skey["MessageType"] == record["MessageType"] and skey["Environment"] == record["Environment"]:
                     record["IdentityToken"] = skey["IdentityToken"]
             record["ServiceId"] = svc_resp["ServiceId"]
             Merchants[record["MerchantProfileId"]] = record
