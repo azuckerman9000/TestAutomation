@@ -19,16 +19,7 @@ class TMSQueryGui(tk.Frame):
         self.tmsop_menubutton = tk.Menubutton(self.main_frame,textvariable=self.tmsop_menubuttonvar,relief="raised")
         self.tmsop_menubutton.grid(row=0,column=0)
         self.tmsop_menu = tk.Menu(self.tmsop_menubutton)
-        self.tmsop_menubutton["menu"] = self.tmsop_menu
-    #    for item in ["QueryTransactionsSummary","QueryTransactionsFamily","QueryTransactionsDetail","QueryBatch"]:
-    #        self.tmsop_menu.add_checkbutton(label=item,onvalue=item,variable=self.tmsop_menuitemvar,command=self.openParamFrame)
-            
-    #def openParamFrame(self):
-    #    self.tmsop_menubuttonvar.set(self.tmsop_menuitemvar.get())
-    #    if self.tmsop_menuitemvar.get() != "QueryBatch" and self.tmsop_menuitemvar.get() != "":
-    #        self.param_frame = TxnParamFrame(self.main_frame,self.tmsop_menuitemvar.get())            
-    #    elif self.tmsop_menuitemvar.get() == "QueryBatch":
-    #        self.param_frame = BatchParamFrame(self.main_frame,self.tmsop_menuitemvar.get())            
+        self.tmsop_menubutton["menu"] = self.tmsop_menu           
         
 class TxnParamFrame:
     def __init__(self,frame,queryname):
@@ -72,6 +63,7 @@ class TxnParamFrame:
         
         self.querytype_var = tk.StringVar()        
         self.includereltd_var = tk.StringVar()
+        self.credsource_var = tk.StringVar()
         self.query_messagevar = tk.StringVar()
         
     def createLabels(self):
@@ -145,14 +137,12 @@ class TxnParamFrame:
         self.txntimestart_menubutton.grid(row=2,column=2)
         self.txntimestart_menu = tk.Menu(self.txntimestart_menubutton)
         self.txntimestart_menubutton["menu"] = self.txntimestart_menu
-        #for item in ["One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago","One Month Ago"]:
-        #    self.txntimestart_menu.add_checkbutton(label=item,onvalue=item,variable=self.txntimestart_menuitemvar,offvalue="")        
+             
         self.txntimeend_menubutton = tk.Menubutton(self.txn_frame,textvariable=self.txntimeend_menubuttonvar,relief="raised")
         self.txntimeend_menubutton.grid(row=2,column=3)
         self.txntimeend_menu = tk.Menu(self.txntimeend_menubutton)
         self.txntimeend_menubutton["menu"] = self.txntimeend_menu        
-        #for item in ["Now","One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago"]:
-        #    self.txntimeend_menu.add_checkbutton(label=item,onvalue=item,variable=self.txntimeend_menuitemvar,offvalue="")
+        
             
         self.capturetimestart_menubutton = tk.Menubutton(self.txn_frame,textvariable=self.capturetimestart_menubuttonvar,relief="raised")
         self.capturetimestart_menubutton.grid(row=4,column=2)
@@ -176,10 +166,18 @@ class TxnParamFrame:
         self.includereltdfalse_radio.grid(row=10,column=3)
         
         self.createquery_button = tk.Button(self.txn_frame,text="Create TMS Query")
-        self.createquery_button.grid(sticky=tk.N,row=13,column=2,columnspan=2) 
+        self.createquery_button.grid(sticky=tk.NE,row=13,column=1,columnspan=2)
         
-        self.query_message = tk.Message(self.txn_frame,textvariable=self.query_messagevar,aspect=600)
-        self.query_message.grid(row=13,column=2,columnspan=2)          
+        self.credsourcetestrun_radio = tk.Radiobutton(self.txn_frame,value="testrun",variable=self.credsource_var,text="Use Authentication From Previous Test Run")
+        self.credsourcetestrun_radio.grid(sticky=tk.E,row=13,column=1,columnspan=3)
+        self.credsourcetestrun_radio.select()
+        self.credsourcesklist_radio = tk.Radiobutton(self.txn_frame,value="sklist",variable=self.credsource_var,text="Use Authentication From List of ServiceKeys")
+        self.credsourcesklist_radio.grid(sticky=tk.SE,row=13,column=1,columnspan=3)
+        
+        self.sklist_button = tk.Button(self.txn_frame,text="Select ServiceKey") 
+        
+        self.query_message = tk.Message(self.txn_frame,textvariable=self.query_messagevar,aspect=800)
+        self.query_message.grid(sticky=tk.SE,row=12,column=1,columnspan=2)          
                 
     def createDetailFormat(self):
         self.txndetlfrmt_var = tk.StringVar()
@@ -197,11 +195,3 @@ class BatchParamFrame:
     def __init__(self,frame):
         self.batch_frame = tk.Frame(frame)
         
-
-        
-        
-    
-        
-#gui = TMSQueryGui()
-#gui.master.title("TMS Queries")
-#gui.mainloop()

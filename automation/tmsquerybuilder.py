@@ -7,53 +7,90 @@ class QueryBuilder:
         self.dataload = {}
         
         self.createTranslators()
-        self.createArrayStrings()        
         
     def createTranslators(self):        
         guiarrayvars = ["amounts_var","apprvcds_var","batchids_var","merchprofids_var","ordernums_var","serviceids_var","servicekeys_var","txnids_var"]
-        CWSarrayvars = ["Amounts","ApprovalCodes","BatchIds","MerchantProfileIds","OrderNumbers","ServiceIds","ServiceKeys","TransactionIds"]
-        guienumvars = ["capturestates","cardtypes","txnstates"] 
-        CWSenumvars = ["CaptureStates","CardTypes","TransactionStates"]
+        if set(guiarrayvars) & set(self.queryparams) != set([]):
+            self.arraytranslator = dict(zip(guiarrayvars,["Amounts","ApprovalCodes","BatchIds","MerchantProfileIds","OrderNumbers","ServiceIds","ServiceKeys","TransactionIds"]))
+            self.createArrayStrings()
+            
+        guienumvars = ["capturestates","cardtypes","txnstates"]    
+        if set(guienumvars) & set(self.queryparams) != set([]):
+            self.enumtranslator = dict(zip(guienumvars,["CaptureStates","CardTypes","TransactionStates"]))
+            self.createEnumStrings()
+         
         guifixedvars = ["querytype_var","includereltd_var","txndetlfrmt_var"]
-        CWSfixedvars = ["QueryType","IncludeRelated","TransactionDetailFormat"]
+        if set(guifixedvars) & set(self.queryparams) != set([]):
+            self.fixedtranslator = dict(zip(guifixedvars,["QueryType","IncludeRelated","TransactionDetailFormat"]))
+            self.createFixedStrings()
+        
         guitimevars = ["txntimestart_menuitemvar","txntimeend_menuitemvar","capturetimestart_menuitemvar","capturetimeend_menuitemvar"]
-        CWStimevars = ["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime"]
-        self.arraytranslator = dict(zip(guiarrayvars,CWSarrayvars))
-        self.enumtranslator = dict(zip(guienumvars,CWSenumvars))
-        self.fixedtranslator = dict(zip(guifixedvars,CWSfixedvars))
-        self.timetranslator = dict(zip(guitimevars,CWStimevars))
+        if set(guitimevars) & set(self.queryparams) != set([]):
+            self.timetranslator = dict(zip(guitimevars,["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime"]))
+            self.createDateTimeStrings() 
         
     def createArrayStrings(self):
         for guivar, CWSvar in self.arraytranslator.items():
             if guivar in self.queryparams.keys():                
                 for value in self.queryparams[guivar]:
-                    self.dataload[CWSvar] = self.dataload[CWSvar] + '<ns1:string xmlns:ns1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">' + value + '</ns1:string>\n'
+                    if CWSvar in self.dataload:
+                        self.dataload[CWSvar] = self.dataload[CWSvar] + '<ns1:string xmlns:ns1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">' + value + '</ns1:string>\n'
+                    else:
+                        self.dataload[CWSvar] = '<ns1:string xmlns:ns1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">' + value + '</ns1:string>\n'
+    
+    def createEnumStrings(self):
+        for guivar, CWSvar in self.enumtranslator.items():
+            if guivar in self.queryparams.keys():
+                for value in self.queryparams[guivar]:
+                    if CWSvar in self.dataload:
+                        self.dataload[CWSvar] = self.dataload[CWSvar] + '<ns2:' + CWSvar + ' xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions">' + value + '</ns2:' + CWSvar + '>\n'
+                    else:
+                        self.dataload[CWSvar] = '<ns2:' + CWSvar + ' xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions">' + value + '</ns2:' + CWSvar + '>\n'
+                    
+    def createFixedStrings(self):
+        for guivar, CWSvar in self.fixedtranslator.items():
+            if guivar in self.queryparams.keys():
+                for value in self.queryparams[guivar]:
+                    self.dataload[CWSvar] = value
+            
+    def createDateTimeStrings(self):
+        currtimevars = set(["txntimestart_menuitemvar","capturetimestart_menuitemvar"]) & set(list(self.queryparams.keys()))        
+        for var in list(currtimevars):
+            if var.find("txn") != -1:
+                times = self.getDateTime(self.queryparams["txntimestart_menuitemvar"][0],self.queryparams["txntimeend_menuitemvar"][0])                
+                self.dataload[self.timetranslator["txntimestart_menuitemvar"]] = times[0].split(".")[0] + "Z"
+                self.dataload[self.timetranslator["txntimeend_menuitemvar"]] = times[1].split(".")[0] + "Z"
+            elif var.find("capture") != -1:
+                times = self.getDateTime(self.queryparams["capturetimestart_menuitemvar"][0],self.queryparams["capturetimeend_menuitemvar"][0])
+                self.dataload[self.timetranslator["capturetimestart_menuitemvar"]] = times[0].split(".")[0] + "Z"
+                self.dataload[self.timetranslator["capturetimeend_menuitemvar"]] = times[1].split(".")[0] + "Z"
                                     
     def getDateTime(self,starttime,endtime):
-        times = {}
+        times = []
         today = datetime.datetime.utcnow()
         for timestr in [starttime,endtime]:
             if timestr == "Now":
-                times[timestr] = today.isoformat()                
+                times.append(today.isoformat())                
             elif timestr == "One Hour Ago":
-                times[timestr] = today - datetime.timedelta(hours=1)
-                times[timestr].isoformat()
+                dt = today - datetime.timedelta(hours=1)
+                times.append(dt.isoformat())                
             elif timestr == "Four Hours Ago":
-                times[timestr] = today - datetime.timedelta(hours=4)
-                times[timestr].isoformat()
+                dt = today - datetime.timedelta(hours=4)
+                times.append(dt.isoformat())                
             elif timestr == "Eight Hours Ago":
-                times[timestr] = today - datetime.timedelta(hours=8)
-                times[timestr].isoformat()
+                dt = today - datetime.timedelta(hours=8)
+                times.append(dt.isoformat())                
             elif timestr == "One Day Ago":
-                times[timestr] = today - datetime.timedelta(days=1)
-                times[timestr].isoformat()
+                dt = today - datetime.timedelta(days=1)
+                times.append(dt.isoformat())                
             elif timestr == "Two Days Ago":
-                times[timestr] = today - datetime.timedelta(days=2)
-                times[timestr].isoformat()
+                dt = today - datetime.timedelta(days=2)
+                times.append(dt.isoformat())                
             elif timestr == "One Week Ago":
-                times[timestr] = today - datetime.timedelta(days=7)
-                times[timestr].isoformat()
+                dt = today - datetime.timedelta(days=7)
+                times.append(dt.isoformat())                
             elif timestr == "One Month Ago":
-                times[timestr] = today - datetime.timedelta(days=30)
-                times[timestr].isoformat()
+                dt = today - datetime.timedelta(days=30)
+                times.append(dt.isoformat())                
+        return times
     

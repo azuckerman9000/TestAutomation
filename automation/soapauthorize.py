@@ -136,7 +136,7 @@ class SOAPRequest:
         self.getChildNode(TxnNode,"CustomerPresent").text = self.TransactionData["CustomerPresent"]
         self.getChildNode(TxnNode,"EntryMode").text = self.TransactionData["EntryMode"]        
             
-        if self.TestCaseInfo["IndustryType"] in ["Retail","Restaurant"]:
+        if self.TestCaseInfo["IndustryType"] in ["Retail","Restaurant","MOTO"]:
             self.getChildNode(TxnNode,"EmployeeId").text = self.TransactionData["EmployeeId"]            
         if self.TestCaseInfo["IndustryType"] in ["Restaurant"]:
             self.getChildNode(TxnNode,"TipAmount").text = self.TransactionData["TipAmount"]            

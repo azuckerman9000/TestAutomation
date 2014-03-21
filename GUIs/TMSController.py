@@ -25,7 +25,9 @@ class TMSGuiController:
         for item in self.times[1:8]:
             self.gui.param_frame.capturetimestart_menu.add_checkbutton(label=item,onvalue=item,variable=self.gui.param_frame.capturetimestart_menuitemvar,offvalue="",command=lambda: self.timeStartMenuLogic("capture"))
             
-        self.gui.param_frame.createquery_button["command"] = self.getInputValues        
+        self.gui.param_frame.createquery_button["command"] = self.getInputValues
+        self.gui.param_frame.credsourcesklist_radio["command"] = self.chooseCreds
+        self.gui.param_frame.credsourcetestrun_radio["command"] = self.chooseCreds        
         
     def timeStartMenuLogic(self,varkey):
         self.gui.param_frame.__dict__[varkey + "timeend_menu"].delete(0,tk.END)             #Deletes any existing menu options in the "To" menu if they exist - due to re-selecting From time
@@ -44,7 +46,7 @@ class TMSGuiController:
         self.queryparams = {}
         for key,val in self.gui.param_frame.__dict__.items(): 
             if key.find("var") != -1 and val.get() != "":   #Narrows down items to populate self.queryparams with - widget variables that are not empty strings             
-                if key.find("list") == -1 and key.find("button") == -1 and key.find("message") == -1: #Narrows down items to populate self.queryparams with - widget variables that are not listvars or buttonvars or messagevars
+                if key.find("list") == -1 and key.find("button") == -1 and key.find("message") == -1 and key.find("credsource") == -1: #Narrows down items to populate self.queryparams with - widget variables that are not listvars or buttonvars or messagevars or the credsourcevar
                     self.queryparams[key] = val.get().split(",")
         
         for varkey in ["txn","capture"]:
@@ -61,10 +63,9 @@ class TMSGuiController:
                 self.queryparams[listbox] = []                                           #Prepares a dict entry as a list for selected entries
                 for index in self.gui.param_frame.__dict__[listbox + "_listbox"].curselection(): #For each selection, append it to list in dict created above
                     self.queryparams[listbox].append(self.gui.param_frame.__dict__[listbox + "_listbox"].get(index))
-        self.Query = QB.QueryBuilder(self.queryparams)
-            
         
-        print(self.queryparams)
+        self.Query = QB.QueryBuilder(self.queryparams)
+                
             
 app = TMSGuiController()
 app.gui.mainloop()
