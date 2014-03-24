@@ -39,6 +39,21 @@ class TMSGuiController:
         for item in self.times[0:self.times.index(starttime)]:                              #Populates the To menu with conditional values based on the From menu selection value
             self.gui.param_frame.__dict__[varkey + "timeend_menu"].add_checkbutton(label=item,onvalue=item,variable=self.gui.param_frame.__dict__[varkey + "timeend_menuitemvar"],offvalue="",command=lambda: self.updateTimeEndMenu(varkey))
     
+    def chooseCreds(self):
+        if self.gui.param_frame.credsource_var.get() == "sklist":            
+            self.gui.param_frame.sklist_menubutton.grid(sticky=tk.NW,row=14,column=2,columnspan=2)
+            self.sklist = QB.getCredentials("CWSData")
+            for item in self.sklist.keys():
+                self.gui.param_frame.sklist_menu.add_checkbutton(label=item,onvalue=item,variable=self.gui.param_frame.sklist_menuitemvar,offvalue="",command=self.updateSklistMenu)
+        elif self.gui.param_frame.credsource_var.get() == "testrun":
+            self.gui.param_frame.sklist_menu.delete(0,tk.END)
+            self.gui.param_frame.sklist_menubuttonvar.set("Select ServiceKey")
+            self.gui.param_frame.sklist_menuitemvar.set("")
+            self.gui.param_frame.sklist_menubutton.grid_forget()
+                
+    def updateSklistMenu(self):
+        self.gui.param_frame.sklist_menubuttonvar.set(self.gui.param_frame.sklist_menuitemvar.get())
+    
     def updateTimeEndMenu(self,varkey):
         self.gui.param_frame.__dict__[varkey + "timeend_menubuttonvar"].set(self.gui.param_frame.__dict__[varkey + "timeend_menuitemvar"].get())
         
@@ -46,7 +61,7 @@ class TMSGuiController:
         self.queryparams = {}
         for key,val in self.gui.param_frame.__dict__.items(): 
             if key.find("var") != -1 and val.get() != "":   #Narrows down items to populate self.queryparams with - widget variables that are not empty strings             
-                if key.find("list") == -1 and key.find("button") == -1 and key.find("message") == -1 and key.find("credsource") == -1: #Narrows down items to populate self.queryparams with - widget variables that are not listvars or buttonvars or messagevars or the credsourcevar
+                if key.find("list") == -1 and key.find("button") == -1 and key.find("message") == -1 and key.find("credsource") == -1 and key.find("sklist") == -1: #Narrows down items to populate self.queryparams with - widget variables that are not listvars or buttonvars or messagevars or the credsourcevar
                     self.queryparams[key] = val.get().split(",")
         
         for varkey in ["txn","capture"]:
@@ -65,6 +80,10 @@ class TMSGuiController:
                     self.queryparams[listbox].append(self.gui.param_frame.__dict__[listbox + "_listbox"].get(index))
         
         self.Query = QB.QueryBuilder(self.queryparams)
+        if self.gui.param_frame.credsource_var.get() == "sklist":
+            QB.buildDataSource(self.Query.dataload,self.sklist[self.gui.param_frame.sklist_menuitemvar.get()])
+        elif self.gui.param_frame.credsource_var.get() == "testrun":
+            QB.buildDataSource(self.Query.dataload,None)
                 
             
 app = TMSGuiController()

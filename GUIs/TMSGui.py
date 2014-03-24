@@ -66,6 +66,10 @@ class TxnParamFrame:
         self.credsource_var = tk.StringVar()
         self.query_messagevar = tk.StringVar()
         
+        self.sklist_menubuttonvar = tk.StringVar()
+        self.sklist_menubuttonvar.set("Select ServiceKey")
+        self.sklist_menuitemvar = tk.StringVar()
+        
     def createLabels(self):
         self.txnparam_label = tk.Label(self.txn_frame,text="Query Transactions Parameters:",relief=tk.GROOVE,pady=4)
         self.txnparam_label.grid(row=0,columnspan=4)
@@ -174,7 +178,9 @@ class TxnParamFrame:
         self.credsourcesklist_radio = tk.Radiobutton(self.txn_frame,value="sklist",variable=self.credsource_var,text="Use Authentication From List of ServiceKeys")
         self.credsourcesklist_radio.grid(sticky=tk.SE,row=13,column=1,columnspan=3)
         
-        self.sklist_button = tk.Button(self.txn_frame,text="Select ServiceKey") 
+        self.sklist_menubutton = tk.Menubutton(self.txn_frame,textvariable=self.sklist_menubuttonvar,relief="raised")
+        self.sklist_menu = tk.Menu(self.sklist_menubutton)
+        self.sklist_menubutton["menu"] = self.sklist_menu 
         
         self.query_message = tk.Message(self.txn_frame,textvariable=self.query_messagevar,aspect=800)
         self.query_message.grid(sticky=tk.SE,row=12,column=1,columnspan=2)          

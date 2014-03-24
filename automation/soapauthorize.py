@@ -184,9 +184,10 @@ class SOAPRequest:
         newfile.seek(0,0)        
         NewLineList[0] = '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard/Pro" xmlns:ns3="http://schemas.evosnap.com/CWS/v2.0/Transactions" xmlns:ns4="http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">\n'
         if self.AndCapInd == 0:
-            NewLineList[2] = '<Authorize xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">\n'
+            NewLineList[2] = '<Authorize xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">\n'            
         else:
             NewLineList[2] = '<AuthorizeAndCapture xmlns="http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing">\n'
+            NewLineList[len(NewLineList)- 3] = '</AuthorizeAndCapture>\n'
         NewLineList[3] = '<sessionToken>${Test 1: SignOnWithTokenResult}</sessionToken>\n'
         NewLineList[4] = '<transaction xsi:type="ns2:BankcardTransactionPro">\n'
         for line in NewLineList:
@@ -203,13 +204,19 @@ class SOAPRequest:
         IdtFile = os.path.abspath(os.path.join(self.data_files,"IdentityToken.csv"))        
         varfile = open(IdtFile, 'w')
         
-        varfile.write("MessageType,Environment,IdentityToken\n")
+        soapaction = ""
+        if self.AndCapInd == 0:
+            soapaction = 'http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing/ICwsTransactionProcessing/Authorize'
+        else:
+            soapaction = 'http://schemas.evosnap.com/CWS/v2.0/TransactionProcessing/ICwsTransactionProcessing/AuthorizeAndCapture'            
+        
+        varfile.write("MessageType,Environment,SOAPAction,IdentityToken\n")
                
         line2 = ""
         if self.TestCaseInfo["MessageType"] == "SOAP":
-            line2 = "SOAP,"+ self.TestCaseInfo["Environment"] + "," + self.HighLevelData["Credentials"]["IdentityToken"]
+            line2 = "SOAP,"+ self.TestCaseInfo["Environment"] + "," + soapaction + "," + self.HighLevelData["Credentials"]["IdentityToken"]
         elif self.TestCaseInfo["MessageType"] == "REST":
-            line2 = "REST," + self.TestCaseInfo["Environment"] + "," + self.HighLevelData["Credentials"]["IdentityToken"]
+            line2 = "REST," + self.TestCaseInfo["Environment"] + "," + soapaction + "," + self.HighLevelData["Credentials"]["IdentityToken"]
         
         varfile.write(line2)                   
         varfile.close()

@@ -1,5 +1,8 @@
 import os
 import datetime
+import requests
+from requests.auth import HTTPBasicAuth
+import json
 
 class QueryBuilder:
     def __init__(self,queryparams):
@@ -93,4 +96,20 @@ class QueryBuilder:
                 dt = today - datetime.timedelta(days=30)
                 times.append(dt.isoformat())                
         return times
+
+#####-----Functions ----- #####
+    
+def getCredentials(DBname):
+    url = "http://localhost:2480/cluster/" + DBname + "/Credentials/50"
+    r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
+    creds = {}
+    for record in json.loads(r1.text)["result"]:
+        creds[record["ServiceKey"]+"-"+record["Environment"]+"-"+record["MessageType"]] = record["@rid"]
+    return creds
+
+def buildDataSource(data,recordid):
+    data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')       
+    if recordid == None:
+        credsourcefile = os.path.abspath(os.path.join(data_files,"IdentityToken.csv"))
+        
     
