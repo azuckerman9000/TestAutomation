@@ -170,20 +170,20 @@ class TxnParamFrame:
         self.includereltdfalse_radio.grid(row=10,column=3)
         
         self.createquery_button = tk.Button(self.txn_frame,text="Create TMS Query")
-        self.createquery_button.grid(sticky=tk.NE,row=13,column=1,columnspan=2)
+        self.createquery_button.grid(sticky=tk.E,row=13,column=1,columnspan=2)
         
         self.credsourcetestrun_radio = tk.Radiobutton(self.txn_frame,value="testrun",variable=self.credsource_var,text="Use Authentication From Previous Test Run")
-        self.credsourcetestrun_radio.grid(sticky=tk.E,row=13,column=1,columnspan=3)
+        self.credsourcetestrun_radio.grid(sticky=tk.SE,row=13,column=1,columnspan=3)
         self.credsourcetestrun_radio.select()
         self.credsourcesklist_radio = tk.Radiobutton(self.txn_frame,value="sklist",variable=self.credsource_var,text="Use Authentication From List of ServiceKeys")
-        self.credsourcesklist_radio.grid(sticky=tk.SE,row=13,column=1,columnspan=3)
+        self.credsourcesklist_radio.grid(sticky=tk.NE,row=14,column=1,columnspan=3)
         
         self.sklist_menubutton = tk.Menubutton(self.txn_frame,textvariable=self.sklist_menubuttonvar,relief="raised")
         self.sklist_menu = tk.Menu(self.sklist_menubutton)
         self.sklist_menubutton["menu"] = self.sklist_menu 
         
-        self.query_message = tk.Message(self.txn_frame,textvariable=self.query_messagevar,aspect=800)
-        self.query_message.grid(sticky=tk.SE,row=12,column=1,columnspan=2)          
+        self.query_message = tk.Message(self.txn_frame,textvariable=self.query_messagevar,aspect=800,fg='red')
+        self.query_message.grid(sticky=tk.NW,row=13,column=2,columnspan=2)          
                 
     def createDetailFormat(self):
         self.txndetlfrmt_var = tk.StringVar()
@@ -192,10 +192,10 @@ class TxnParamFrame:
         self.txndetlfrmt_label.grid(sticky=tk.N,row=11,column=2,columnspan=2)
         
         self.txndetlfrmttxn_radio = tk.Radiobutton(self.txn_frame,value="CWSTransaction",variable=self.txndetlfrmt_var,text="CWS Transaction")
-        self.txndetlfrmttxn_radio.grid(sticky=tk.S,row=11,column=2)
+        self.txndetlfrmttxn_radio.grid(sticky=tk.N,row=12,column=2)
         self.txndetlfrmttxn_radio.select()
         self.txndetlfrmtsrl_radio = tk.Radiobutton(self.txn_frame,value="SerializedCWS",variable=self.txndetlfrmt_var,text="Serialized CWS")
-        self.txndetlfrmtsrl_radio.grid(sticky=tk.S,row=11,column=3)
+        self.txndetlfrmtsrl_radio.grid(sticky=tk.N,row=12,column=3)
         
 class BatchParamFrame:
     def __init__(self,frame):

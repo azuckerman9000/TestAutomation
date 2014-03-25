@@ -3,11 +3,12 @@ import datetime
 import requests
 from requests.auth import HTTPBasicAuth
 import json
+import csv
 
 class QueryBuilder:
     def __init__(self,queryparams):
         self.queryparams = queryparams
-        self.dataload = {}
+        self.dataload = {}        
         
         self.createTranslators()
         
@@ -30,25 +31,29 @@ class QueryBuilder:
         guitimevars = ["txntimestart_menuitemvar","txntimeend_menuitemvar","capturetimestart_menuitemvar","capturetimeend_menuitemvar"]
         if set(guitimevars) & set(self.queryparams) != set([]):
             self.timetranslator = dict(zip(guitimevars,["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime"]))
-            self.createDateTimeStrings() 
+            self.createDateTimeStrings()            
+        
+        self.colnames = list(set(["Amounts","ApprovalCodes","BatchIds","MerchantProfileIds","OrderNumbers","ServiceIds","ServiceKeys","TransactionIds"]) | 
+                             set(["CaptureStates","CardTypes","TransactionStates"]) | set(["QueryType","IncludeRelated","TransactionDetailFormat"]) | 
+                             set(["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime"]))
         
     def createArrayStrings(self):
         for guivar, CWSvar in self.arraytranslator.items():
             if guivar in self.queryparams.keys():                
                 for value in self.queryparams[guivar]:
                     if CWSvar in self.dataload:
-                        self.dataload[CWSvar] = self.dataload[CWSvar] + '<ns1:string xmlns:ns1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">' + value + '</ns1:string>\n'
+                        self.dataload[CWSvar] = self.dataload[CWSvar] + '<ns10:string xmlns:ns10="http://schemas.microsoft.com/2003/10/Serialization/Arrays">' + value + '</ns10:string>\n'
                     else:
-                        self.dataload[CWSvar] = '<ns1:string xmlns:ns1="http://schemas.microsoft.com/2003/10/Serialization/Arrays">' + value + '</ns1:string>\n'
+                        self.dataload[CWSvar] = '<ns10:string xmlns:ns10="http://schemas.microsoft.com/2003/10/Serialization/Arrays">' + value + '</ns10:string>\n'
     
     def createEnumStrings(self):
         for guivar, CWSvar in self.enumtranslator.items():
             if guivar in self.queryparams.keys():
                 for value in self.queryparams[guivar]:
                     if CWSvar in self.dataload:
-                        self.dataload[CWSvar] = self.dataload[CWSvar] + '<ns2:' + CWSvar + ' xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions">' + value + '</ns2:' + CWSvar + '>\n'
+                        self.dataload[CWSvar] = self.dataload[CWSvar] + '<ns11:' + CWSvar[:-1] + ' xmlns:ns11="http://schemas.evosnap.com/CWS/v2.0/Transactions">' + value + '</ns11:' + CWSvar[:-1] + '>\n'
                     else:
-                        self.dataload[CWSvar] = '<ns2:' + CWSvar + ' xmlns:ns2="http://schemas.evosnap.com/CWS/v2.0/Transactions">' + value + '</ns2:' + CWSvar + '>\n'
+                        self.dataload[CWSvar] = '<ns11:' + CWSvar[:-1] + ' xmlns:ns11="http://schemas.evosnap.com/CWS/v2.0/Transactions">' + value + '</ns11:' + CWSvar[:-1] + '>\n'
                     
     def createFixedStrings(self):
         for guivar, CWSvar in self.fixedtranslator.items():
@@ -107,9 +112,40 @@ def getCredentials(DBname):
         creds[record["ServiceKey"]+"-"+record["Environment"]+"-"+record["MessageType"]] = record["@rid"]
     return creds
 
-def buildDataSource(data,recordid):
-    data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')       
-    if recordid == None:
-        credsourcefile = os.path.abspath(os.path.join(data_files,"IdentityToken.csv"))
+def buildDataSource(data,colnames,tmsop,recordid):
+    data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')
+    tmsdatapath = os.path.abspath(os.path.join(data_files,"TMSData.csv"))
+    credsourcepath = os.path.abspath(os.path.join(data_files,"IdentityToken.csv"))
+    columns = []
+    values = []       
+    if recordid == None:        
+        credsourcefile = open(credsourcepath,'r')
+        rowreader = csv.reader(credsourcefile,delimiter=",",lineterminator='\n')       
+        columns = next(rowreader)
+        values = next(rowreader)
+        credsourcefile.close()        
+    else:
+        url = "http://localhost:2480/document/CWSData/" + recordid[1:]
+        r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
+        cred = json.loads(r1.text)
+        columns = ["MessageType","Environment","IdentityToken"]
+        values = [cred["MessageType"],cred["Environment"],cred["IdentityToken"]]
+    
+    for colname in colnames:
+        columns.append(colname)
+        if colname in data.keys():
+            values.append(data[colname])
+        else:
+            values.append("")
+    columns.append("OperationName")
+    values.append(tmsop)
+            
+    tmsdatafile = open(tmsdatapath,'w')
+    rowwriter = csv.writer(tmsdatafile,delimiter=",",lineterminator='\n')
+    rowwriter.writerow(columns)
+    rowwriter.writerow(values)
+    tmsdatafile.close()    
+        
+        
         
     

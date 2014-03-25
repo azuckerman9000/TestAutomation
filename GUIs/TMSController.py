@@ -12,7 +12,11 @@ class TMSGuiController:
         
     def openParamFrame(self):        
         self.gui.tmsop_menubuttonvar.set(self.gui.tmsop_menuitemvar.get())
-        if self.gui.tmsop_menuitemvar.get() != "QueryBatch" and self.gui.tmsop_menuitemvar.get() != "":
+        if "param_frame" in self.gui.__dict__.keys():
+            self.gui.param_frame.txn_frame.grid_forget()
+            self.gui.param_frame.txn_frame.destroy()
+            del self.gui.param_frame
+        if self.gui.tmsop_menuitemvar.get() != "QueryBatch" and self.gui.tmsop_menuitemvar.get() != "":            
             self.gui.param_frame = TMSGui.TxnParamFrame(self.gui.main_frame,self.gui.tmsop_menuitemvar.get())
             self.setUpTxnParamCallBacks()            
         elif self.gui.tmsop_menuitemvar.get() == "QueryBatch":
@@ -41,7 +45,7 @@ class TMSGuiController:
     
     def chooseCreds(self):
         if self.gui.param_frame.credsource_var.get() == "sklist":            
-            self.gui.param_frame.sklist_menubutton.grid(sticky=tk.NW,row=14,column=2,columnspan=2)
+            self.gui.param_frame.sklist_menubutton.grid(sticky=tk.W,row=14,column=2,columnspan=2)
             self.sklist = QB.getCredentials("CWSData")
             for item in self.sklist.keys():
                 self.gui.param_frame.sklist_menu.add_checkbutton(label=item,onvalue=item,variable=self.gui.param_frame.sklist_menuitemvar,offvalue="",command=self.updateSklistMenu)
@@ -81,9 +85,10 @@ class TMSGuiController:
         
         self.Query = QB.QueryBuilder(self.queryparams)
         if self.gui.param_frame.credsource_var.get() == "sklist":
-            QB.buildDataSource(self.Query.dataload,self.sklist[self.gui.param_frame.sklist_menuitemvar.get()])
+            QB.buildDataSource(self.Query.dataload,self.Query.colnames,self.gui.tmsop_menuitemvar.get(),self.sklist[self.gui.param_frame.sklist_menuitemvar.get()])
         elif self.gui.param_frame.credsource_var.get() == "testrun":
-            QB.buildDataSource(self.Query.dataload,None)
+            QB.buildDataSource(self.Query.dataload,self.Query.colnames,self.gui.tmsop_menuitemvar.get(),None)
+        self.gui.param_frame.query_messagevar.set("Query Built.")
                 
             
 app = TMSGuiController()
