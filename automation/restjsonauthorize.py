@@ -5,9 +5,11 @@ import os
 from globalvars import globalvars
 
 class RestJsonRequest:
-    def __init__(self,TestCaseId,AndCapInd):
+    def __init__(self,TestCaseId,AndCapInd,magensadata):
         self.DBname = globalvars.DBNAME
         self.TestCaseId = TestCaseId
+        if magensadata != None:
+            self.magensadata = magensadata
         
         self.data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')
         JsonTemp = os.path.abspath(os.path.join(self.data_files,"Auth_RestJson_Template.json")) 
@@ -57,6 +59,11 @@ class RestJsonRequest:
             del self.json_template["Transaction"]["TenderData"]["CardData"]
             del self.json_template["Transaction"]["TenderData"]["CardSecurityData"]
             del self.json_template["Transaction"]["TenderData"]["EcommerceSecurityData"]
+            self.json_template["Transaction"]["TenderData"]["SecurePaymentAccountData"] = self.magensadata["SecurePaymentAccountData"]
+            self.json_template["Transaction"]["TenderData"]["EncryptionKeyId"] = self.magensadata["EncryptionKeyId"]
+            self.json_template["Transaction"]["TenderData"]["SwipeStatus"] = self.magensadata["SwipeStatus"]
+            self.json_template["Transaction"]["TenderData"]["DeviceSerialNumber"] = self.magensadata["DeviceSerialNumber"]
+            return
             
         #Card Data Populate
         if self.TestCaseInfo["EntryMode"] == "Keyed": #Must get EntryMode from TestCase:TransactionData

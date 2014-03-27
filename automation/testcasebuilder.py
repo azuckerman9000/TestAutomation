@@ -372,6 +372,7 @@ class Transaction:
             record["ServiceId"] = svc_resp["ServiceId"]
             Merchants[record["MerchantProfileId"]] = record
         return Merchants
+    
         
     def dataRules(self):    
         #Input Rules

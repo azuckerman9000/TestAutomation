@@ -61,8 +61,7 @@ class TCBuildGui(tk.Frame):
         self.card_label.grid(sticky=tk.NW,row=7,column=0)
         
     def createVariables(self):
-        self.db_var = tk.StringVar()
-                
+        self.db_var = tk.StringVar()                
         
         self.tender_menuvar = tk.StringVar()
         self.tender_menuvar.set("TenderType")
@@ -222,7 +221,15 @@ class TCBuildGui(tk.Frame):
         self.andcapture_button.grid(row=4,column=2,rowspan=2)
         
     def createSOAPReq(self,RecordId):
-        req = soapauthorize.SOAPRequest(RecordId,self.andcapture_var.get())
+        magensadata = None
+        if self.tcview.magensa_var.get() != "" and self.tcview.magensaind == True:
+            fields = self.tcview.magensa_var.get().split("|")
+            magensadata = {"SecurePaymentAccountData":fields[3],"EncryptionKeyId":fields[9], "SwipeStatus":fields[5],
+                           "IdentificationInformation":fields[6],"DeviceSerialNumber":fields[7]}
+        elif self.tcview.magensa_var.get() == "" and self.tcview.magensaind == True:
+            self.soapreq_messagevar.set("Cannot leave Magensa swipe empty!")
+            return
+        req = soapauthorize.SOAPRequest(RecordId,self.andcapture_var.get(),magensadata)
         self.soapreq_messagevar.set("SOAP Request Created for TestCase record = " + RecordId)
         
     def createRESTReqButton(self):
@@ -234,7 +241,15 @@ class TCBuildGui(tk.Frame):
         self.restreq_message.grid(sticky=tk.NW,row=5,column=3)
         
     def createRESTReq(self,RecordId):
-        req = restjsonauthorize.RestJsonRequest(RecordId,self.andcapture_var.get())
+        magensadata = None
+        if self.tcview.magensa_var.get() != "" and self.tcview.magensaind == True:
+            fields = self.tcview.magensa_var.get().split("|")
+            magensadata = {"SecurePaymentAccountData":fields[3],"EncryptionKeyId":fields[9], "SwipeStatus":fields[5],
+                           "IdentificationInformation":fields[6],"DeviceSerialNumber":fields[7]}
+        elif self.tcview.magensa_var.get() == "" and self.tcview.magensaind == True:
+            self.soapreq_messagevar.set("Cannot leave Magensa swipe empty!")
+            return
+        req = restjsonauthorize.RestJsonRequest(RecordId,self.andcapture_var.get(),magensadata)
         self.restreq_messagevar.set("REST Request Created for TestCase record = " + RecordId)
 
 class OptionalArgsFrame:
@@ -321,6 +336,8 @@ class ViewExistingTests:
         
         self.tcdisp_var = tk.IntVar()
         
+        self.magensa_var = tk.StringVar()
+        
     def createWidgets(self):
         self.tcsoap_scroll = tk.Scrollbar(self.tests_frame,orient=tk.VERTICAL)
         self.tcsoap_scroll.grid(sticky=tk.N+tk.S,row=0,column=1)
@@ -334,7 +351,10 @@ class ViewExistingTests:
         self.tcrest_listbox.grid(sticky=tk.NE,row=1,column=0)
         self.tcrest_scroll["command"] = self.tcrest_listbox.yview
         
-        self.tcdisp_canvas = tk.Canvas(self.tests_frame,relief=tk.RIDGE,bd=2)        
+        self.tcdisp_canvas = tk.Canvas(self.tests_frame,relief=tk.RIDGE,bd=2)
+        
+        self.magensa_label = tk.Label(self.tests_frame,text="Magensa Swipe:")
+        self.magensa_entry = tk.Entry(self.tests_frame,textvariable=self.magensa_var,width=120)        
         
     def showTestCases(self):
         
@@ -394,7 +414,17 @@ class ViewExistingTests:
                 builder.restreq_button["state"] = "active"
                 builder.soapreq_button["state"] = "disabled"
                 builder.restreq_button["command"] = lambda: builder.createRESTReq(json.loads(self.displaymap[event.widget.get(event.widget.curselection()[0])])["TCRecordId"][1:])            
-                
+        
+        if event.widget.get(event.widget.curselection()[0]).find("Magensa") != -1:
+            self.magensa_label.grid(sticky=tk.NW,row=2,column=0)
+            self.magensa_entry.grid(sticky=tk.NE,row=2,column=0,columnspan=3)
+            self.magensaind = True
+        else:
+            self.magensa_label.grid_forget()
+            self.magensa_entry.grid_forget()
+            self.magensa_var.set("")
+            self.magensaind = False
+        
 class SaveMerchantProfileFrame:
     def __init__(self,frame):
                

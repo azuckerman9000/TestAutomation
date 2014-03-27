@@ -7,10 +7,12 @@ import os
 from globalvars import globalvars
 
 class SOAPRequest:
-    def __init__(self,TestCaseId,AndCapInd):
+    def __init__(self,TestCaseId,AndCapInd,magensadata):
         self.DBname = globalvars.DBNAME
         self.TestCaseId = TestCaseId
         self.AndCapInd = AndCapInd
+        if magensadata != None:
+            self.magensadata = magensadata
         
         self.data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')
         SOAPTemp = os.path.abspath(os.path.join(self.data_files,"Auth_SOAP_Template.xml"))        
@@ -80,7 +82,11 @@ class SOAPRequest:
         if self.TestCaseInfo["Workflow"] == "Magensa":
             TenderDataNode.remove(self.getChildNode(TenderDataNode,"CardData"))
             TenderDataNode.remove(self.getChildNode(TenderDataNode,"CardSecurityData"))
-            TenderDataNode.remove(self.getChildNode(TenderDataNode,"EcommerceSecurityData"))            
+            TenderDataNode.remove(self.getChildNode(TenderDataNode,"EcommerceSecurityData"))
+            self.getChildNode(TenderDataNode,"SecurePaymentAccountData").text = self.magensadata["SecurePaymentAccountData"]
+            self.getChildNode(TenderDataNode,"EncryptionKeyId").text = self.magensadata["EncryptionKeyId"]
+            self.getChildNode(TenderDataNode,"SwipeStatus").text = self.magensadata["SwipeStatus"]
+            self.getChildNode(TenderDataNode,"DeviceSerialNumber").text = self.magensadata["DeviceSerialNumber"]           
             return        
         
         CardDataNode = self.getParentNode("CardData")
