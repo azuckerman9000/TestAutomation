@@ -46,7 +46,7 @@ class TMSGuiController:
     def chooseCreds(self):
         if self.gui.param_frame.credsource_var.get() == "sklist":            
             self.gui.param_frame.sklist_menubutton.grid(sticky=tk.W,row=14,column=2,columnspan=2)
-            self.sklist = QB.getCredentials("CWSData")
+            self.sklist = QB.getCredentials()
             for item in self.sklist.keys():
                 self.gui.param_frame.sklist_menu.add_checkbutton(label=item,onvalue=item,variable=self.gui.param_frame.sklist_menuitemvar,offvalue="",command=self.updateSklistMenu)
         elif self.gui.param_frame.credsource_var.get() == "testrun":

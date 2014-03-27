@@ -1,6 +1,7 @@
 from automation import datacreate
 import tkinter as tk
 import json
+from globalvars import globalvars
 
 class GuiFrame(tk.Frame):
     def __init__(self, master=None):
@@ -43,7 +44,7 @@ class GuiFrame(tk.Frame):
         self.dumpproperties_button.grid(sticky=tk.NW,row=1,column=1)
         
     def DBInitbuttonLogic(self):        
-        self.DB = datacreate.Database("CWSData")
+        self.DB = datacreate.Database()
         self.DB_Init_button["state"] = "disabled"
         
         self.createclasses_button["state"] = "active"
@@ -253,9 +254,8 @@ class NewPropertyFrame:
             self.linkclass_menuitemvar.set("")
             self.addLinkClassMenuItems()
             
-    def addPropTypeMenuItems(self):
-        items = ["STRING","INTEGER","LINK","LINKLIST","EMBEDDEDLIST","EMBEDDEDMAP"]
-        for item in items:
+    def addPropTypeMenuItems(self):        
+        for item in globalvars.PROPERTYTYPES:
             self.prop_type_menu.add_checkbutton(label=item,variable=self.prop_type_menuitemvar,onvalue=item, command=self.updateProptypeButton)
             
     def updateProptypeButton(self):

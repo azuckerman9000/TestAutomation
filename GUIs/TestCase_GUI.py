@@ -5,7 +5,7 @@ import tkinter as tk
 import re
 import json
 import os
-
+from globalvars import globalvars
 
 class TCBuildGui(tk.Frame):
     def __init__(self,master=None):
@@ -23,11 +23,11 @@ class TCBuildGui(tk.Frame):
         self.optionals.createVariables()
         self.optionals.createWidgets()
         
-        self.tcview = ViewExistingTests(self,self.db_var.get())
+        self.tcview = ViewExistingTests(self)
         self.tcview.createWidgets()
         self.tcview.showTestCases()
         
-        self.mpview = SaveMerchantProfileFrame(self,self.db_var.get())
+        self.mpview = SaveMerchantProfileFrame(self)
         self.mpview.createWidgets()
         
         self.createBuildButton()
@@ -62,7 +62,7 @@ class TCBuildGui(tk.Frame):
         
     def createVariables(self):
         self.db_var = tk.StringVar()
-        self.db_var.set("CWSData")        
+                
         
         self.tender_menuvar = tk.StringVar()
         self.tender_menuvar.set("TenderType")
@@ -102,49 +102,49 @@ class TCBuildGui(tk.Frame):
         self.tender_menubutton.grid(sticky=tk.NW,row=1,column=1)
         self.tender_menu = tk.Menu(self.tender_menubutton)
         self.tender_menubutton["menu"] = self.tender_menu
-        for item in ["Credit","PINDebit"]:
+        for item in globalvars.TENDERTYPES:
             self.tender_menu.add_checkbutton(label=item,variable=self.tender_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("tender"))
             
         self.message_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.message_menuvar, state="active")
         self.message_menubutton.grid(sticky=tk.NW,row=2,column=1)
         self.message_menu = tk.Menu(self.message_menubutton)
         self.message_menubutton["menu"] = self.message_menu
-        for item in ["SOAP","REST"]:
+        for item in globalvars.MESSAGETYPES:
             self.message_menu.add_checkbutton(label=item,variable=self.message_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("message"))
         
         self.host_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.host_menuvar, state="active")
         self.host_menubutton.grid(sticky=tk.NW,row=3,column=1)
         self.host_menu = tk.Menu(self.host_menubutton)
         self.host_menubutton["menu"] = self.host_menu
-        for item in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS"]:
+        for item in globalvars.HOSTNAMES:
             self.host_menu.add_checkbutton(label=item,variable=self.host_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("host"))
             
         self.industry_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.industry_menuvar, state="active")
         self.industry_menubutton.grid(sticky=tk.NW,row=4,column=1)
         self.industry_menu = tk.Menu(self.industry_menubutton)
         self.industry_menubutton["menu"] = self.industry_menu
-        for item in ["Retail","Restaurant","Ecommerce","MOTO"]:
+        for item in globalvars.INDUSTRYTYPES:
             self.industry_menu.add_checkbutton(label=item,variable=self.industry_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("industry"))
             
         self.workflow_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.workflow_menuvar, state="active")
         self.workflow_menubutton.grid(sticky=tk.NW,row=5,column=1)
         self.workflow_menu = tk.Menu(self.workflow_menubutton)
         self.workflow_menubutton["menu"] = self.workflow_menu
-        for item in ["Magensa","ReD","None"]:
+        for item in globalvars.WORKFLOWS:
             self.workflow_menu.add_checkbutton(label=item,variable=self.workflow_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("workflow"))
             
         self.environment_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.environment_menuvar, state="active")
         self.environment_menubutton.grid(sticky=tk.NW,row=6,column=1)
         self.environment_menu = tk.Menu(self.environment_menubutton)
         self.environment_menubutton["menu"] = self.environment_menu
-        for item in ["TEST","CERT","PROD"]:
+        for item in globalvars.ENVIRONMENTS:
             self.environment_menu.add_checkbutton(label=item,variable=self.environment_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("environment"))
             
         self.card_menubutton = tk.Menubutton(self.build_frame,relief="raised",textvariable=self.card_menuvar, state="active")
         self.card_menubutton.grid(sticky=tk.NW,row=7,column=1)
         self.card_menu = tk.Menu(self.card_menubutton)
         self.card_menubutton["menu"] = self.card_menu
-        for item in ["Visa","MasterCard","AmericanExpress","Discover"]:
+        for item in globalvars.CARDTYPES:
             self.card_menu.add_checkbutton(label=item,variable=self.card_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("card"))
     
     def updateButton(self,varname):
@@ -161,7 +161,7 @@ class TCBuildGui(tk.Frame):
         self.buildtxn_message.grid(sticky=tk.NW,row=2,column=1)    
         
     def buildTransaction(self):
-        self.reqfields = [self.db_var.get(),self.tender_menuitemvar.get(),self.message_menuitemvar.get(),self.host_menuitemvar.get(),self.industry_menuitemvar.get(),self.workflow_menuitemvar.get(),self.environment_menuitemvar.get(),self.card_menuitemvar.get()]
+        self.reqfields = [self.tender_menuitemvar.get(),self.message_menuitemvar.get(),self.host_menuitemvar.get(),self.industry_menuitemvar.get(),self.workflow_menuitemvar.get(),self.environment_menuitemvar.get(),self.card_menuitemvar.get()]
         self.optfields = [self.optionals.cv_var.get(),self.optionals.avs_var.get(),self.optionals.threed_var.get(),self.optionals.level2_menuitemvar.get(),self.optionals.billpay_menuitemvar.get()]
         allfields = True
         for field in self.reqfields:
@@ -174,11 +174,13 @@ class TCBuildGui(tk.Frame):
             for field in self.optfields:
                 if field != "":
                     args.append(field)
-                    if field in ["Exempt","NotExempt"]:
+                    if field in globalvars.LEVEL2ARGS:
                         args.append("Level2")
-                    elif field in ["Recurring","Installment"]:
-                        args.append("BillPay")             
-            self.tc = testcasebuilder.Transaction(self.db_var.get(),self.tender_menuitemvar.get(),self.message_menuitemvar.get(),self.host_menuitemvar.get(),self.industry_menuitemvar.get(),self.workflow_menuitemvar.get(),self.environment_menuitemvar.get(),self.card_menuitemvar.get(), *args)
+                    elif field in globalvars.BILLPAYARGS:
+                        args.append("BillPay")
+            if self.db_var.get() != "":
+                globalvars.DBNAME = self.db_var.get()             
+            self.tc = testcasebuilder.Transaction(self.tender_menuitemvar.get(),self.message_menuitemvar.get(),self.host_menuitemvar.get(),self.industry_menuitemvar.get(),self.workflow_menuitemvar.get(),self.environment_menuitemvar.get(),self.card_menuitemvar.get(), *args)
             self.buildtxn_messagevar.set("Test Case RecordId ="+ self.tc.TestCaseRecordId)
             #self.soapreq_button["state"] = "active"            
             self.tcview.showTestCases() 
@@ -219,8 +221,8 @@ class TCBuildGui(tk.Frame):
         self.andcapture_button = tk.Checkbutton(self,text="AndCapture",variable=self.andcapture_var,onvalue=1,offvalue=0)
         self.andcapture_button.grid(row=4,column=2,rowspan=2)
         
-    def createSOAPReq(self,DBname,RecordId):
-        req = soapauthorize.SOAPRequest(DBname,RecordId,self.andcapture_var.get())
+    def createSOAPReq(self,RecordId):
+        req = soapauthorize.SOAPRequest(RecordId,self.andcapture_var.get())
         self.soapreq_messagevar.set("SOAP Request Created for TestCase record = " + RecordId)
         
     def createRESTReqButton(self):
@@ -231,8 +233,8 @@ class TCBuildGui(tk.Frame):
         self.restreq_message = tk.Message(self,textvariable=self.restreq_messagevar,aspect=800)
         self.restreq_message.grid(sticky=tk.NW,row=5,column=3)
         
-    def createRESTReq(self,DBname,RecordId):
-        req = restjsonauthorize.RestJsonRequest(DBname,RecordId,self.andcapture_var.get())
+    def createRESTReq(self,RecordId):
+        req = restjsonauthorize.RestJsonRequest(RecordId,self.andcapture_var.get())
         self.restreq_messagevar.set("REST Request Created for TestCase record = " + RecordId)
 
 class OptionalArgsFrame:
@@ -289,14 +291,14 @@ class OptionalArgsFrame:
         self.level2_menubutton.grid(sticky=tk.NW,row=4,column=1)
         self.level2_menu = tk.Menu(self.level2_menubutton)
         self.level2_menubutton["menu"] = self.level2_menu
-        for item in ["Exempt","NotExempt"]:
+        for item in globalvars.LEVEL2ARGS:
             self.level2_menu.add_checkbutton(label=item,variable=self.level2_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("level2"))
             
         self.billpay_menubutton = tk.Menubutton(self.optargs_frame,relief="raised",textvariable=self.billpay_menuvar, state="active")
         self.billpay_menubutton.grid(sticky=tk.NW,row=5,column=1)
         self.billpay_menu = tk.Menu(self.billpay_menubutton)
         self.billpay_menubutton["menu"] = self.billpay_menu
-        for item in ["Recurring","Installment"]:
+        for item in globalvars.BILLPAYARGS:
             self.billpay_menu.add_checkbutton(label=item,variable=self.billpay_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("billpay"))        
             
     def updateButton(self,varname):
@@ -305,8 +307,8 @@ class OptionalArgsFrame:
         self.__dict__[menuvar].set(self.__dict__[menuitemvar].get())
         
 class ViewExistingTests:
-    def __init__(self,frame,DBname):
-        self.DBname = DBname        
+    def __init__(self,frame):
+        #self.DBname = globalvars.DBNAME       
         self.tests_frame = tk.Frame(frame,width=400,height=200)
         self.tests_frame.grid(sticky=tk.NW,row=0,column=2,rowspan=2)
         
@@ -332,52 +334,51 @@ class ViewExistingTests:
         self.tcrest_listbox.grid(sticky=tk.NE,row=1,column=0)
         self.tcrest_scroll["command"] = self.tcrest_listbox.yview
         
-        self.tcdisp_canvas = tk.Canvas(self.tests_frame,relief=tk.RIDGE,bd=2)
+        self.tcdisp_canvas = tk.Canvas(self.tests_frame,relief=tk.RIDGE,bd=2)        
         
     def showTestCases(self):
-        if self.DBname != "":
-            self.TestCases = testcasebuilder.Transaction.getTestCaseInfo(None,self.DBname)
+        
+        self.TestCases = testcasebuilder.Transaction.getTestCaseInfo(None)
             
-            
-            self.displaymap = {}
-            for key,val in self.TestCases.items(): #CReates display map of testcase description and info
-                val["TCRecordId"] = key
-                dispstring = val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"]
-                if set([]) !=  set(["3DSecure","AVSData","CVData"]) & set(val.keys()):
-                    for key in list(set(["3DSecure","AVSData","CVData"]) & set(val.keys())):
-                        dispstring = dispstring + "-" + key
-                if "BillPay" in val.keys():
-                    dispstring = dispstring + "-" + "BillPay:" + val["BillPay"]
-                if "Level2" in val.keys():
-                    dispstring = dispstring + "-" + "Level2:" + val["Level2"]
-                if val["Workflow"] != "None":
-                    dispstring = dispstring + "-" + val["Workflow"]
-                if val["TenderType"] == "PINDebit":
-                    dispstring = dispstring + "-PINDebit" 
-                self.displaymap[dispstring] = json.dumps(val,sort_keys=True, indent=2, separators =(',',':'))
+        self.displaymap = {}
+        for key,val in self.TestCases.items(): #CReates display map of testcase description and info
+            val["TCRecordId"] = key
+            dispstring = val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"]
+            if set([]) !=  set(["3DSecure","AVSData","CVData"]) & set(val.keys()):
+                for key in list(set(["3DSecure","AVSData","CVData"]) & set(val.keys())):
+                    dispstring = dispstring + "-" + key
+            if "BillPay" in val.keys():
+                dispstring = dispstring + "-" + "BillPay:" + val["BillPay"]
+            if "Level2" in val.keys():
+                dispstring = dispstring + "-" + "Level2:" + val["Level2"]
+            if val["Workflow"] != "None":
+                dispstring = dispstring + "-" + val["Workflow"]
+            if val["TenderType"] == "PINDebit":
+                dispstring = dispstring + "-PINDebit" 
+            self.displaymap[dispstring] = json.dumps(val,sort_keys=True, indent=2, separators =(',',':'))
                 
-            restkeys = []
-            soapkeys = []
-            for key,record in self.displaymap.items():
-                if json.loads(record)["MessageType"] == "SOAP":
-                    soapkeys.append(key)
-                else:
-                    restkeys.append(key)
+        restkeys = []
+        soapkeys = []
+        for key,record in self.displaymap.items():
+            if json.loads(record)["MessageType"] == "SOAP":
+                soapkeys.append(key)
+            else:
+                restkeys.append(key)
             
-            self.tcsoap_listvar.set("")           
-            temp = ""
-            for item in sorted(soapkeys):
-                temp = temp + item + " "
-            self.tcsoap_listvar.set(temp)
+        self.tcsoap_listvar.set("")           
+        temp = ""
+        for item in sorted(soapkeys):
+            temp = temp + item + " "
+        self.tcsoap_listvar.set(temp)
             
-            self.tcrest_listvar.set("")           
-            temp = ""
-            for item in sorted(restkeys):
-                temp = temp + item + " "
-            self.tcrest_listvar.set(temp)       
+        self.tcrest_listvar.set("")           
+        temp = ""
+        for item in sorted(restkeys):
+            temp = temp + item + " "
+        self.tcrest_listvar.set(temp)       
                        
-            self.tcsoap_listbox.bind("<ButtonRelease>",self.showInfo)
-            self.tcrest_listbox.bind("<ButtonRelease>",self.showInfo)                
+        self.tcsoap_listbox.bind("<ButtonRelease>",self.showInfo)
+        self.tcrest_listbox.bind("<ButtonRelease>",self.showInfo)                
     
     def showInfo(self,event):        
         if event.widget.curselection() != ():            
@@ -388,19 +389,19 @@ class ViewExistingTests:
             if event.widget.winfo_id() == self.tcsoap_listbox.winfo_id():
                 builder.soapreq_button["state"] = "active"
                 builder.restreq_button["state"] = "disabled" 
-                builder.soapreq_button["command"] = lambda: builder.createSOAPReq(self.DBname,json.loads(self.displaymap[event.widget.get(event.widget.curselection()[0])])["TCRecordId"][1:])
+                builder.soapreq_button["command"] = lambda: builder.createSOAPReq(json.loads(self.displaymap[event.widget.get(event.widget.curselection()[0])])["TCRecordId"][1:])
             else:
                 builder.restreq_button["state"] = "active"
                 builder.soapreq_button["state"] = "disabled"
-                builder.restreq_button["command"] = lambda: builder.createRESTReq(self.DBname,json.loads(self.displaymap[event.widget.get(event.widget.curselection()[0])])["TCRecordId"][1:])            
+                builder.restreq_button["command"] = lambda: builder.createRESTReq(json.loads(self.displaymap[event.widget.get(event.widget.curselection()[0])])["TCRecordId"][1:])            
                 
 class SaveMerchantProfileFrame:
-    def __init__(self,frame,DBname):
-        self.DBname = DBname        
+    def __init__(self,frame):
+               
         self.savemp_frame = tk.Frame(frame,width=275,height=250)
         self.savemp_frame.grid(sticky=tk.NW,row=0,column=1,rowspan=2)
         
-        self.merchinfo = testcasebuilder.Transaction.saveMerchantProfile(None,self.DBname)
+        self.merchinfo = testcasebuilder.Transaction.saveMerchantProfile(None)
         self.merchidt = {}
         for merchname, info in self.merchinfo.items():
             self.merchidt[merchname] = info["IdentityToken"]

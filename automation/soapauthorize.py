@@ -4,10 +4,11 @@ import requests
 from requests.auth import HTTPBasicAuth
 import re
 import os
+from globalvars import globalvars
 
 class SOAPRequest:
-    def __init__(self,DBname,TestCaseId,AndCapInd):
-        self.DBname = DBname
+    def __init__(self,TestCaseId,AndCapInd):
+        self.DBname = globalvars.DBNAME
         self.TestCaseId = TestCaseId
         self.AndCapInd = AndCapInd
         

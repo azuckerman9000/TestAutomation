@@ -2,10 +2,11 @@ import json
 import requests
 from requests.auth import HTTPBasicAuth
 import os
+from globalvars import globalvars
 
 class RestJsonRequest:
-    def __init__(self,DBname,TestCaseId,AndCapInd):
-        self.DBname = DBname
+    def __init__(self,TestCaseId,AndCapInd):
+        self.DBname = globalvars.DBNAME
         self.TestCaseId = TestCaseId
         
         self.data_files = os.path.join(os.path.dirname( __file__ ), '..', 'GUIs/data_files')

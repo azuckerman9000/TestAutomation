@@ -4,6 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 import json
 import csv
+from globalvars import globalvars
 
 class QueryBuilder:
     def __init__(self,queryparams):
@@ -104,8 +105,8 @@ class QueryBuilder:
 
 #####-----Functions ----- #####
     
-def getCredentials(DBname):
-    url = "http://localhost:2480/cluster/" + DBname + "/Credentials/50"
+def getCredentials():
+    url = "http://localhost:2480/cluster/" + globalvars.DBNAME + "/Credentials/50"
     r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
     creds = {}
     for record in json.loads(r1.text)["result"]:
@@ -125,7 +126,7 @@ def buildDataSource(data,colnames,tmsop,recordid):
         values = next(rowreader)
         credsourcefile.close()        
     else:
-        url = "http://localhost:2480/document/CWSData/" + recordid[1:]
+        url = "http://localhost:2480/document/" + globalvars.DBNAME + "/" + recordid[1:]
         r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
         cred = json.loads(r1.text)
         columns = ["MessageType","Environment","IdentityToken"]

@@ -4,13 +4,14 @@ import re
 from requests.auth import HTTPBasicAuth
 import sys
 import os
+from globalvars import globalvars
 
 
 class Database:
     
-    def __init__(self,dbname):
+    def __init__(self):
         #Gets list of classes already created in DB, minus the OrientDB default classes
-        self.DBname = dbname
+        self.DBname = globalvars.DBNAME
         self.ClassNames = []
         excludedclasses = ["OFunction","OGraphEdge","OIdentity","OGraphVertex","ORIDs","ORestricted","ORole","OUser","_version"]        
         dbURL = "http://localhost:2480/database/" + self.DBname

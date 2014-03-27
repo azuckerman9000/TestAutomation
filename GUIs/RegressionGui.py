@@ -6,7 +6,7 @@ from requests.auth import HTTPBasicAuth
 from automation import datacreate
 import csv
 import os
-
+from globalvars import globalvars
 
 class RegressionGui(tk.Frame):
     def __init__(self,master=None):
@@ -20,8 +20,7 @@ class RegressionGui(tk.Frame):
         self.getTestCases()
         
     def createVariables(self):
-        self.dbname_var = tk.StringVar()
-        self.dbname_var.set("CWSData")
+        self.dbname_var = tk.StringVar()        
         
         self.envselect_menuvar = tk.StringVar()
         self.envselect_menuvar.set("Select Environment")        
@@ -42,6 +41,9 @@ class RegressionGui(tk.Frame):
     def createWidgets(self):
         self.dbname_entry = tk.Entry(self.main_frame,textvariable=self.dbname_var)
         self.dbname_entry.grid(sticky=tk.N,row=0,column=0,columnspan=3)
+        
+        self.dbname_label = tk.Label(self.main_frame,text="Alt DB Name:")
+        self.dbname_label.grid(sticky=tk.NE,row=0,column=0)
         
         self.refresh_button = tk.Button(self.main_frame,text="Refresh Data",command=self.getTestCases)
         self.refresh_button.grid(sticky=tk.NW,row=0,column=2)
@@ -76,8 +78,10 @@ class RegressionGui(tk.Frame):
         self.datasource_button = tk.Button(self.main_frame,text="Create Regression DataSource",command=self.createDataSource)
         self.create_message = tk.Message(self.main_frame, textvariable=self.create_messagevar,aspect=1100)
     
-    def getTestCases(self):
-        URL = "http://localhost:2480/cluster/" + self.dbname_var.get() + "/TestCase/100"
+    def getTestCases(self):        
+        if self.dbname_var.get() != "":
+            globalvars.DBNAME = self.dbname_var.get()           
+        URL = "http://localhost:2480/cluster/" + globalvars.DBNAME + "/TestCase/100"           
         r = requests.get(URL, auth=HTTPBasicAuth('admin','admin'))
         self.testcases = json.loads(r.text)
         
@@ -121,11 +125,13 @@ class RegressionGui(tk.Frame):
                     self.tcset[record["@rid"]] = record["TestCaseInfo"]
                     
     def createDataSource(self):
+        if self.dbname_var.get() != "":
+            globalvars.DBNAME = self.dbname_var.get()
         if self.messagetype_menuitemvar.get() != "" and self.envselect_menuitemvar.get() != "":
             dscolnames = []
-            classnames = set(datacreate.Database(self.dbname_var.get()).ClassNames) - set(["TestCase,TenderData"])
+            classnames = set(datacreate.Database().ClassNames) - set(["TestCase,TenderData"])
             for name in list(classnames):
-                r = requests.get("http://localhost:2480/class/" + self.dbname_var.get() + "/" + name,auth=HTTPBasicAuth('admin','admin'))
+                r = requests.get("http://localhost:2480/class/" + globalvars.DBNAME + "/" + name,auth=HTTPBasicAuth('admin','admin'))
                 for prop in json.loads(r.text)["properties"]:
                     if prop["type"] == "STRING" or prop["type"] == "INTEGER":
                         dscolnames.append(name + ":" + prop["name"])            
@@ -137,7 +143,7 @@ class RegressionGui(tk.Frame):
                 self.datadict[name] = []
             
             for i,tcrid in enumerate(self.tcset.keys()):
-                r = requests.get("http://localhost:2480/document/" + self.dbname_var.get() + "/" + tcrid[1:] + "/*:2",auth=HTTPBasicAuth('admin','admin'))            
+                r = requests.get("http://localhost:2480/document/" + globalvars.DBNAME + "/" + tcrid[1:] + "/*:2",auth=HTTPBasicAuth('admin','admin'))            
                 self.getFields(json.loads(r.text), i)
                 for val in self.datadict.values():
                     if len(val) == i:

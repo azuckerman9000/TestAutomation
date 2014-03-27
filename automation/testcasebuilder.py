@@ -4,10 +4,10 @@ import re
 from requests.auth import HTTPBasicAuth
 import sys
 import tkinter as tk
-
+from globalvars import globalvars
 
 class Transaction:
-    def __init__(self,DBname,TenderType,MessageType,Host,IndustryType,Workflow,Environment,CardType, *args): #*args values can be [CVData, AVSData, 3DSecure, Level2, BillPay, Recurring or Installment, Exempt or NotExempt]
+    def __init__(self,TenderType,MessageType,Host,IndustryType,Workflow,Environment,CardType, *args): #*args values can be [CVData, AVSData, 3DSecure, Level2, BillPay, Recurring or Installment, Exempt or NotExempt]
         
         
         self.args = args
@@ -34,7 +34,7 @@ class Transaction:
         self.Workflow = Workflow
         self.Environment = Environment
         self.CardType = CardType
-        self.DBname = DBname
+        self.DBname = globalvars.DBNAME
         
         self.dataRules() #Checks to see that inputs can build a valid test case
         self.getTestCaseRecord() #Checks if test case already exists in DB based on input params. sets self.TestCaseRecordId to record id, if found.
@@ -92,8 +92,7 @@ class Transaction:
         for record in merch_resp["result"]:
             if self.IndustryType == record["IndustryType"] and self.ServiceRecordId == record["ServiceId"] and self.MessageType == record["MessageType"]:
                 possiblemerchants[record["MerchantProfileId"]] = record["@rid"]
-        if len(possiblemerchants.keys()) > 1:
-            possiblemerchants["DBname"] = self.DBname            
+        if len(possiblemerchants.keys()) > 1:                        
             while self.MerchantProfileId == "":
                 popup = MerchantSelectFrame(**possiblemerchants)
                 popup.master.title("Select Merchant")
@@ -350,8 +349,8 @@ class Transaction:
         self.getTransactionData()
         self.createTestCaseRecord()
         
-    def getTestCaseInfo(self,DBname): #For displaying created test cases in GUI
-        clustURL = "http://localhost:2480/cluster/" + DBname + "/TestCase"
+    def getTestCaseInfo(self): #For displaying created test cases in GUI, not called from class instance
+        clustURL = "http://localhost:2480/cluster/" + globalvars.DBNAME + "/TestCase"
         r = requests.get(clustURL, auth=HTTPBasicAuth('admin','admin'))
         TestCases = {}
         for record in json.loads(r.text)["result"]:
@@ -359,9 +358,9 @@ class Transaction:
             TestCases[record["@rid"]] = text
         return TestCases
     
-    def saveMerchantProfile(self,DBname):
-        clustURL = "http://localhost:2480/cluster/" + DBname + "/Merchant/100"
-        docURL = "http://localhost:2480/document/" + DBname + "/"
+    def saveMerchantProfile(self): # not called from class instance
+        clustURL = "http://localhost:2480/cluster/" + globalvars.DBNAME + "/Merchant/100"
+        docURL = "http://localhost:2480/document/" + globalvars.DBNAME + "/"
         r = requests.get(clustURL, auth=HTTPBasicAuth('admin','admin'))
         Merchants = {}
         for record in json.loads(r.text)["result"]:            
@@ -376,25 +375,25 @@ class Transaction:
         
     def dataRules(self):    
         #Input Rules
-        if self.TenderType not in ["Credit","PINDebit"]:
+        if self.TenderType not in globalvars.TENDERTYPES:
             print('Invalid Tender Type. Must be one of: "Credit","PINDebit"')
             sys.exit()
-        if self.MessageType not in ["SOAP","REST"]:    
+        if self.MessageType not in globalvars.MESSAGETYPES:    
             print('Invalid Message Type. Must be one of: "SOAP","REST"')
             sys.exit()
-        if self.Host not in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS"]:    
+        if self.Host not in globalvars.HOSTNAMES:    
             print('Invalid Host. Must be one of: "EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox"')
             sys.exit()
-        if self.IndustryType not in ["Retail","Restaurant","MOTO","Ecommerce"]:    
+        if self.IndustryType not in globalvars.INDUSTRYTYPES:    
             print('Invalid Industry Type. Must be one of: "Retail","Restaurant","MOTO","Ecommerce"')
             sys.exit()
-        if self.Workflow not in ["None","Magensa","ReD"]:    
+        if self.Workflow not in globalvars.WORKFLOWS:    
             print('Invalid Industry Type. Must be one of: "None","Magensa","ReD"')
             sys.exit()
-        if self.Environment not in ["TEST","CERT","PROD"]:    
+        if self.Environment not in globalvars.ENVIRONMENTS:    
             print('Invalid Environment. Must be one of: "TEST","CERT","PROD"')
             sys.exit()
-        if self.CardType not in ["Visa","MasterCard","Discover","AmericanExpress"]:
+        if self.CardType not in globalvars.CARDTYPES:
             print('Invalid Card Type. Must be one of: "Visa","MasterCard","Discover","AmericanExpress"')
             sys.exit()
         #Validate DataBase
@@ -406,7 +405,7 @@ class Transaction:
         if self.IndustryType == "Restaurant" and "Level2" in self.args:
             print("No Level2 for IndustryType: Restaurant")
             sys.exit()
-        Level2Args = set(["Exempt","NotExempt"])
+        Level2Args = set(globalvars.LEVEL2ARGS)
         if "Level2" in self.args and not list(Level2Args & set(self.args)):
             print('No arguments found for Level2. Must delcare "Exempt" or "NotExempt"')
             sys.exit()
@@ -414,11 +413,11 @@ class Transaction:
             print('Too Many arguments for Level2 found in args. Exactly 1 required.')
             sys.exit()
         #CVData, AVSData, BillPay, Rules
-        TenderArgs = set(["CVData","AVSData","BillPay"])    
+        TenderArgs = set(globalvars.OPTIONALARGS)    
         if list(TenderArgs & set(self.args)) and self.IndustryType in ["Retail","Restaurant"]:
             print("No " + ",".join([str(i) for i in TenderArgs]) + ", for IndustryType: " + self.IndustryType)
             sys.exit()
-        BillPayArgs = set(["Recurring","Installment"])
+        BillPayArgs = set(globalvars.BILLPAYARGS)
         if "BillPay" in self.args and not list(BillPayArgs & set(self.args)):    
             print('No argument found for BillPay. Must declare "Recurring" or "Installment"')
             sys.exit()
@@ -446,8 +445,7 @@ class MerchantSelectFrame(tk.Frame):
         #self.popup_frame = tk.Frame(self,height=400,width=400)
         #self.popup_frame.grid(row=0,column=0)
         #self.popup_frame.grid_propagate(0)
-        self.DBname = possiblemerchants["DBname"]
-        del possiblemerchants["DBname"]
+        self.DBname = globalvars.DBNAME        
         self.possiblemerchants = possiblemerchants        
         
         self.createVariables()
