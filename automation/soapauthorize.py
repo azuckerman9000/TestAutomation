@@ -79,19 +79,20 @@ class SOAPRequest:
         r = requests.get(url = docURL + self.TestCase["TenderData"][1:] + "/*:1",auth=HTTPBasicAuth('admin','admin'))
         self.TenderData = json.loads(r.text)        
         TenderDataNode = self.getParentNode("TenderData")
+        CardSecNode = self.getParentNode("CardSecurityData")
+        
         if self.TestCaseInfo["Workflow"] == "Magensa":
-            TenderDataNode.remove(self.getChildNode(TenderDataNode,"CardData"))
-            TenderDataNode.remove(self.getChildNode(TenderDataNode,"CardSecurityData"))
+            TenderDataNode.remove(self.getChildNode(TenderDataNode,"CardData"))           
             TenderDataNode.remove(self.getChildNode(TenderDataNode,"EcommerceSecurityData"))
             self.getChildNode(TenderDataNode,"SecurePaymentAccountData").text = self.magensadata["SecurePaymentAccountData"]
             self.getChildNode(TenderDataNode,"EncryptionKeyId").text = self.magensadata["EncryptionKeyId"]
             self.getChildNode(TenderDataNode,"SwipeStatus").text = self.magensadata["SwipeStatus"]
-            self.getChildNode(TenderDataNode,"DeviceSerialNumber").text = self.magensadata["DeviceSerialNumber"]           
+            self.getChildNode(TenderDataNode,"DeviceSerialNumber").text = self.magensadata["DeviceSerialNumber"]
+            self.getChildNode(CardSecNode,"IdentificationInformation").text = self.magensadata["IdentificationInformation"]           
             return        
         
         CardDataNode = self.getParentNode("CardData")
-        EcommSecNode = self.getParentNode("EcommerceSecurityData")
-        CardSecNode = self.getParentNode("CardSecurityData")
+        EcommSecNode = self.getParentNode("EcommerceSecurityData")        
         AVSNode = self.getParentNode("AVSData")
         #Card Data Populate
         if self.TestCaseInfo["EntryMode"] == "Keyed": #Must get EntryMode from TestCase:TransactionData

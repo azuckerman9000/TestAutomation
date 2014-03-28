@@ -80,10 +80,10 @@ class RegressionGui(tk.Frame):
     
     def getTestCases(self):        
         if self.dbname_var.get() != "":
-            globalvars.DBNAME = self.dbname_var.get()           
-        URL = "http://localhost:2480/cluster/" + globalvars.DBNAME + "/TestCase/100"           
-        r = requests.get(URL, auth=HTTPBasicAuth('admin','admin'))
-        self.testcases = json.loads(r.text)
+            globalvars.DBNAME = self.dbname_var.get()        
+        URL = "http://localhost:2480/query/" + globalvars.DBNAME + "/sql/select from TestCase where TestCaseInfo.Workflow = 'None'"           
+        r = requests.get(URL, auth=HTTPBasicAuth('admin','admin'))        
+        self.testcases = json.loads(r.text)              
         
     def updateButton(self,varname):
         menuvar = varname + "_menuvar"
@@ -99,7 +99,17 @@ class RegressionGui(tk.Frame):
             self.getTCSubSet(self.envselect_menuitemvar.get(),self.messagetype_menuitemvar.get(),self.hosttype_menuitemvar.get())            
             tempstr = ""
             for info in self.tcset.values():
-                tempstr = tempstr + info["MessageType"] + "-" + re.sub(r" ","-",info["Host"]) + "-" + info["IndustryType"] + "-" + info["CardType"] + " "
+                tempstr = tempstr + info["MessageType"] + "-" + re.sub(r" ","-",info["Host"]) + "-" + info["IndustryType"] + "-" + info["CardType"]
+                if set([]) != set(globalvars.OPTIONALARGS) & set(info.keys()):
+                    for key in list(set(globalvars.OPTIONALARGS) & set(info.keys())):
+                        tempstr = tempstr + "-" + key
+                if "BillPay" in info.keys():
+                    tempstr = tempstr + "-BillPay:" + info["BillPay"]
+                if "Level2" in info.keys():
+                    tempstr = tempstr + "-Level2:" + info["Level2"]
+                if info["TenderType"] == "PINDebit":
+                    tempstr = tempstr + "-PINDebit"
+                tempstr = tempstr + " "
             self.tcdisp_var.set(tempstr)
             self.datasource_button.grid(sticky=tk.N,row=3,column=0,columnspan=4)
             self.create_message.grid_forget()           

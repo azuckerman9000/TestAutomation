@@ -56,13 +56,13 @@ class RestJsonRequest:
         self.TenderData = json.loads(r.text)
         
         if self.TestCaseInfo["Workflow"] == "Magensa":
-            del self.json_template["Transaction"]["TenderData"]["CardData"]
-            del self.json_template["Transaction"]["TenderData"]["CardSecurityData"]
+            del self.json_template["Transaction"]["TenderData"]["CardData"]            
             del self.json_template["Transaction"]["TenderData"]["EcommerceSecurityData"]
             self.json_template["Transaction"]["TenderData"]["SecurePaymentAccountData"] = self.magensadata["SecurePaymentAccountData"]
             self.json_template["Transaction"]["TenderData"]["EncryptionKeyId"] = self.magensadata["EncryptionKeyId"]
             self.json_template["Transaction"]["TenderData"]["SwipeStatus"] = self.magensadata["SwipeStatus"]
             self.json_template["Transaction"]["TenderData"]["DeviceSerialNumber"] = self.magensadata["DeviceSerialNumber"]
+            self.json_template["Transaction"]["TenderData"]["CardSecurityData"]["IdentificationInformation"] = self.magensadata["IdentificationInformation"]
             return
             
         #Card Data Populate

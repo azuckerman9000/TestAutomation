@@ -364,8 +364,8 @@ class ViewExistingTests:
         for key,val in self.TestCases.items(): #CReates display map of testcase description and info
             val["TCRecordId"] = key
             dispstring = val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"]
-            if set([]) !=  set(["3DSecure","AVSData","CVData"]) & set(val.keys()):
-                for key in list(set(["3DSecure","AVSData","CVData"]) & set(val.keys())):
+            if set([]) !=  set(globalvars.OPTIONALARGS) & set(val.keys()):
+                for key in list(set([globalvars.OPTIONALARGS]) & set(val.keys())):
                     dispstring = dispstring + "-" + key
             if "BillPay" in val.keys():
                 dispstring = dispstring + "-" + "BillPay:" + val["BillPay"]
