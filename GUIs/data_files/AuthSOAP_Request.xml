@@ -42,9 +42,10 @@
      <ns4:CardData>
       <ns4:CardType>MasterCard</ns4:CardType>
       <ns4:CardholderName>John Doe</ns4:CardholderName>
+      <ns4:PAN>5499990123456781</ns4:PAN>
+      <ns4:Expire>1215</ns4:Expire>
       <ns4:Track1Data xsi:nil="true" />
-      <ns4:Track2Data>5499990123456781=15121015432198712345</ns4:Track2Data>
-     </ns4:CardData>
+      </ns4:CardData>
      </ns4:TenderData>
     <ns4:TransactionData xsi:type="ns2:BankcardTransactionDataPro">
      <ns3:Amount>1.00</ns3:Amount>
@@ -55,14 +56,14 @@
      <ns4:AccountType>NotSet</ns4:AccountType>
      <ns4:AlternativeMerchantData xsi:nil="true" />
      <ns4:ApprovalCode xsi:nil="true" />
-     <ns4:CustomerPresent>Present</ns4:CustomerPresent>
-     <ns4:EmployeeId>1</ns4:EmployeeId>
-     <ns4:EntryMode>TrackDataFromMSR</ns4:EntryMode>
+     <ns4:CustomerPresent>Ecommerce</ns4:CustomerPresent>
+     <ns4:EmployeeId />
+     <ns4:EntryMode>Keyed</ns4:EntryMode>
      <ns4:InternetTransactionData xsi:nil="true" />
      <ns4:InvoiceNumber xsi:nil="true" />
      <ns4:OrderNumber>1</ns4:OrderNumber>
      <ns4:TerminalId xsi:nil="true" />
-     <ns4:TipAmount>2.00</ns4:TipAmount>
+     <ns4:TipAmount>0.0</ns4:TipAmount>
      <ns4:BatchAssignment xsi:nil="true" />
      <ns4:LaneId xsi:nil="true" />
      <ns4:ScoreThreshold xsi:nil="true" />
@@ -74,8 +75,8 @@
     </ns4:TransactionData>
     </transaction>
    <applicationProfileId>2601</applicationProfileId>
-   <merchantProfileId>EVO_SOAP_Restaurant_TermCap</merchantProfileId>
-   <workflowId>A77A300001</workflowId>
+   <merchantProfileId>Auto_SOAP_Ecommerce</merchantProfileId>
+   <workflowId>1257A00001</workflowId>
   </Authorize>
  </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>

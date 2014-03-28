@@ -365,7 +365,7 @@ class ViewExistingTests:
             val["TCRecordId"] = key
             dispstring = val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"]
             if set([]) !=  set(globalvars.OPTIONALARGS) & set(val.keys()):
-                for key in list(set([globalvars.OPTIONALARGS]) & set(val.keys())):
+                for key in list(set(globalvars.OPTIONALARGS) & set(val.keys())):
                     dispstring = dispstring + "-" + key
             if "BillPay" in val.keys():
                 dispstring = dispstring + "-" + "BillPay:" + val["BillPay"]

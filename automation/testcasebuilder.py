@@ -350,7 +350,7 @@ class Transaction:
         self.createTestCaseRecord()
         
     def getTestCaseInfo(self): #For displaying created test cases in GUI, not called from class instance
-        clustURL = "http://localhost:2480/cluster/" + globalvars.DBNAME + "/TestCase"
+        clustURL = "http://localhost:2480/cluster/" + globalvars.DBNAME + "/TestCase/100"
         r = requests.get(clustURL, auth=HTTPBasicAuth('admin','admin'))
         TestCases = {}
         for record in json.loads(r.text)["result"]:

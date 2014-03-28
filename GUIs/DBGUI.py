@@ -78,21 +78,30 @@ class GuiFrame(tk.Frame):
             self.mapping_frame.mainloop()             
             
 class CreateMapRowFrame(tk.Frame):
-    def __init__(self,master,DB):
+    def __init__(self,DB,master=None):
         tk.Frame.__init__(self, master=None)
         self.grid()
         self.createmaps_frame = tk.Toplevel(height=400,width=400)
         self.createmaps_frame.grid()
         
-        self.DB = DB        
-        for classname, val in self.DB.recstolink:
-            self.reckey_classname[val[1]] = classname
-            self.reckey_recordid[val[1]] = val[0]
-            
-        for classname, val in self.DB.linkchoices:
-            self.linkkey_classname[val[1]] = classname
-            self.linkkey_recordid[val[1]] = val[0]
-            self.classname_linkkeys[classname].append(val[1])
+        self.DB = DB
+        
+        self.reckey_classname = {}
+        self.reckey_recordid = {}               
+        for classname, reclist in self.DB.recstolink.items():
+            for recinfo in reclist:
+                self.reckey_classname[recinfo[1]] = classname
+                self.reckey_recordid[recinfo[1]] = recinfo[0]
+        
+        self.linkkey_classname = {}
+        self.linkkey_recordid = {}
+        self.classname_linkkeys = {}    
+        for classname, choicelist in self.DB.linkchoices.items():
+            self.classname_linkkeys[classname] = []
+            for choiceinfo in choicelist:
+                self.linkkey_classname[choiceinfo[1]] = classname
+                self.linkkey_recordid[choiceinfo[1]] = choiceinfo[0]
+                self.classname_linkkeys[classname].append(choiceinfo[1])
             
         self.createVariables()
         self.createWidgets()        
