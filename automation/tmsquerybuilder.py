@@ -29,14 +29,14 @@ class QueryBuilder:
             self.fixedtranslator = dict(zip(guifixedvars,["QueryType","IncludeRelated","TransactionDetailFormat"]))
             self.createFixedStrings()
         
-        guitimevars = ["txntimestart_menuitemvar","txntimeend_menuitemvar","capturetimestart_menuitemvar","capturetimeend_menuitemvar"]
+        guitimevars = ["txntimestart_menuitemvar","txntimeend_menuitemvar","capturetimestart_menuitemvar","capturetimeend_menuitemvar","batchtimestart_menuitemvar","batchtimeend_menuitemvar"]
         if set(guitimevars) & set(self.queryparams) != set([]):
-            self.timetranslator = dict(zip(guitimevars,["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime"]))
+            self.timetranslator = dict(zip(guitimevars,["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime","BatchDateTime:StartDateTime","BatchDateTime:EndDateTime"]))
             self.createDateTimeStrings()            
         
         self.colnames = list(set(["Amounts","ApprovalCodes","BatchIds","MerchantProfileIds","OrderNumbers","ServiceIds","ServiceKeys","TransactionIds"]) | 
                              set(["CaptureStates","CardTypes","TransactionStates"]) | set(["QueryType","IncludeRelated","TransactionDetailFormat"]) | 
-                             set(["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime"]))
+                             set(["TransactionDateTime:StartDateTime","TransactionDateTime:EndDateTime","CaptureDateTime:StartDateTime","CaptureDateTime:EndDateTime","BatchDateTime:StartDateTime","BatchDateTime:EndDateTime"]))
         
     def createArrayStrings(self):
         for guivar, CWSvar in self.arraytranslator.items():
@@ -63,7 +63,7 @@ class QueryBuilder:
                     self.dataload[CWSvar] = value
             
     def createDateTimeStrings(self):
-        currtimevars = set(["txntimestart_menuitemvar","capturetimestart_menuitemvar"]) & set(list(self.queryparams.keys()))        
+        currtimevars = set(["txntimestart_menuitemvar","capturetimestart_menuitemvar","batchtimestart_menuitemvar"]) & set(list(self.queryparams.keys()))        
         for var in list(currtimevars):
             if var.find("txn") != -1:
                 times = self.getDateTime(self.queryparams["txntimestart_menuitemvar"][0],self.queryparams["txntimeend_menuitemvar"][0])                
@@ -73,6 +73,10 @@ class QueryBuilder:
                 times = self.getDateTime(self.queryparams["capturetimestart_menuitemvar"][0],self.queryparams["capturetimeend_menuitemvar"][0])
                 self.dataload[self.timetranslator["capturetimestart_menuitemvar"]] = times[0].split(".")[0] + "Z"
                 self.dataload[self.timetranslator["capturetimeend_menuitemvar"]] = times[1].split(".")[0] + "Z"
+            elif var.find("batch") != -1:
+                times = self.getDateTime(self.queryparams["batchtimestart_menuitemvar"][0],self.queryparams["batchtimeend_menuitemvar"][0])
+                self.dataload[self.timetranslator["batchtimestart_menuitemvar"]] = times[0].split(".")[0] + "Z"
+                self.dataload[self.timetranslator["batchtimeend_menuitemvar"]] = times[1].split(".")[0] + "Z"
                                     
     def getDateTime(self,starttime,endtime):
         times = []

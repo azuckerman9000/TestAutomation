@@ -1,7 +1,7 @@
 {
   "$type":"AuthorizeTransaction,http://schemas.evosnap.com/CWS/v2.0/Transactions/Rest",
   "ApplicationProfileId":"4084",
-  "MerchantProfileId":"EVO_REST_Retail_TermCap",
+  "MerchantProfileId":"Auto_REST_Retail",
   "Transaction":{
     "$type":"BankcardTransactionPro,http://schemas.evosnap.com/CWS/v2.0/Transactions/Bankcard/Pro",
     "Addendum":{

@@ -251,7 +251,7 @@ class Transaction:
     
     def getTransactionData(self): #updated method to account for self.args instad of self.TenderType
         clustURL = "http://localhost:2480/cluster/" + self.DBname + "/"
-        r1 = requests.get(clustURL + "TransactionData", auth=HTTPBasicAuth('admin','admin'))
+        r1 = requests.get(clustURL + "TransactionData/100", auth=HTTPBasicAuth('admin','admin'))
         txn_resp = json.loads(r1.text)
         for record in txn_resp["result"]:
             if self.EntryMode == record["EntryMode"] and self.TenderType == record["TenderType"] and self.IndustryType == record["IndustryType"]:

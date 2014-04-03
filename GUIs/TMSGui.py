@@ -199,5 +199,80 @@ class TxnParamFrame:
         
 class BatchParamFrame:
     def __init__(self,frame):
-        self.batch_frame = tk.Frame(frame)
+        self.batch_frame = tk.Frame(frame,bd=4,relief=tk.RIDGE,padx=4)
+        self.batch_frame.grid()
+        
+        self.createVariables()
+        self.createLabels()
+        self.createWidgets()
+        
+    def createVariables(self):
+        self.batchids_var = tk.StringVar()
+        self.merchprofids_var = tk.StringVar()
+        self.servicekeys_var = tk.StringVar()
+        self.txnids_var = tk.StringVar()
+        
+        self.batchtimestart_menubuttonvar = tk.StringVar()
+        self.batchtimestart_menubuttonvar.set("From Date-Time")
+        self.batchtimestart_menuitemvar = tk.StringVar()
+        self.batchtimeend_menubuttonvar = tk.StringVar()
+        self.batchtimeend_menubuttonvar.set("To Date-Time")
+        self.batchtimeend_menuitemvar = tk.StringVar()
+        
+        self.credsource_var = tk.StringVar()
+        self.sklist_menubuttonvar = tk.StringVar()
+        self.sklist_menubuttonvar.set("Select ServiceKey")
+        self.sklist_menuitemvar = tk.StringVar()
+        self.query_messagevar = tk.StringVar()
+        
+    def createLabels(self):
+        self.batchids_label = tk.Label(self.batch_frame,text="BatchIds:")
+        self.batchids_label.grid(sticky=tk.W,row=1,column=0)
+        self.merchprofids_label = tk.Label(self.batch_frame,text="MerchantProfileIds:")
+        self.merchprofids_label.grid(sticky=tk.W,row=2,column=0)
+        self.servicekeys_label = tk.Label(self.batch_frame,text="ServiceKeys:")
+        self.servicekeys_label.grid(sticky=tk.W,row=3,column=0)
+        self.txnids_label = tk.Label(self.batch_frame,text="Txn Guids:")
+        self.txnids_label.grid(sticky=tk.W,row=4,column=0)
+        self.batchdatetime_label = tk.Label(self.batch_frame,text="Batch Date-Time Range:")
+        self.batchdatetime_label.grid(row=5,column=0)
+        
+    def createWidgets(self):
+        self.batchparam_label = tk.Label(self.batch_frame,text="Query Batch Parameters:",relief=tk.GROOVE,pady=4)
+        self.batchparam_label.grid(row=0,columnspan=2)
+        self.batchids_entry = tk.Entry(self.batch_frame,textvariable=self.batchids_var,width=70)
+        self.batchids_entry.grid(sticky=tk.W,row=1,column=1)
+        self.merchprofids_entry = tk.Entry(self.batch_frame,textvariable=self.merchprofids_var,width=70)
+        self.merchprofids_entry.grid(sticky=tk.W,row=2,column=1)
+        self.servicekeys_entry = tk.Entry(self.batch_frame,textvariable=self.servicekeys_var,width=70)
+        self.servicekeys_entry.grid(sticky=tk.W,row=3,column=1)
+        self.txnids_entry = tk.Entry(self.batch_frame,textvariable=self.txnids_var,width=70)
+        self.txnids_entry.grid(sticky=tk.W,row=4,column=1)
+        
+        self.batchtimestart_menubutton = tk.Menubutton(self.batch_frame,textvariable=self.batchtimestart_menubuttonvar,relief="raised")
+        self.batchtimestart_menubutton.grid(row=6,column=0)
+        self.batchtimestart_menu = tk.Menu(self.batchtimestart_menubutton)
+        self.batchtimestart_menubutton["menu"] = self.batchtimestart_menu
+             
+        self.batchtimeend_menubutton = tk.Menubutton(self.batch_frame,textvariable=self.batchtimeend_menubuttonvar,relief="raised")
+        self.batchtimeend_menubutton.grid(sticky=tk.W,row=6,column=1)
+        self.batchtimeend_menu = tk.Menu(self.batchtimeend_menubutton)
+        self.batchtimeend_menubutton["menu"] = self.batchtimeend_menu
+        
+        self.createquery_button = tk.Button(self.batch_frame,text="Create TMS Query")
+        self.createquery_button.grid(row=10,column=0,columnspan=2)
+        
+        self.credsourcetestrun_radio = tk.Radiobutton(self.batch_frame,value="testrun",variable=self.credsource_var,text="Use Authentication From Previous Test Run")
+        self.credsourcetestrun_radio.grid(row=7,column=0,columnspan=2)
+        self.credsourcetestrun_radio.select()
+        self.credsourcesklist_radio = tk.Radiobutton(self.batch_frame,value="sklist",variable=self.credsource_var,text="Use Authentication From List of ServiceKeys")
+        self.credsourcesklist_radio.grid(row=8,column=0,columnspan=2)
+        
+        self.sklist_menubutton = tk.Menubutton(self.batch_frame,textvariable=self.sklist_menubuttonvar,relief="raised")
+        self.sklist_menu = tk.Menu(self.sklist_menubutton)
+        self.sklist_menubutton["menu"] = self.sklist_menu 
+        
+        self.query_message = tk.Message(self.batch_frame,textvariable=self.query_messagevar,aspect=800,fg='red')
+        self.query_message.grid(row=11,column=0,columnspan=2) 
+        
         

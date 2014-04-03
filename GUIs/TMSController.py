@@ -20,7 +20,8 @@ class TMSGuiController:
             self.gui.param_frame = TMSGui.TxnParamFrame(self.gui.main_frame,self.gui.tmsop_menuitemvar.get())
             self.setUpTxnParamCallBacks()            
         elif self.gui.tmsop_menuitemvar.get() == "QueryBatch":
-            self.gui.param_frame = TMSGui.BatchParamFrame(self.gui.main_frame,self.gui.tmsop_menuitemvar.get())
+            self.gui.param_frame = TMSGui.BatchParamFrame(self.gui.main_frame)
+            self.setUpBatchParamCallBacks()
         
     def setUpTxnParamCallBacks(self):
         self.times = ["Now","One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago","One Month Ago"]
@@ -32,6 +33,15 @@ class TMSGuiController:
         self.gui.param_frame.createquery_button["command"] = self.getInputValues
         self.gui.param_frame.credsourcesklist_radio["command"] = self.chooseCreds
         self.gui.param_frame.credsourcetestrun_radio["command"] = self.chooseCreds        
+    
+    def setUpBatchParamCallBacks(self):
+        self.times = ["Now","One Hour Ago","Four Hours Ago","Eight Hours Ago","One Day Ago","Two Days Ago","One Week Ago","One Month Ago"]
+        for item in self.times[1:8]:
+            self.gui.param_frame.batchtimestart_menu.add_checkbutton(label=item,onvalue=item,variable=self.gui.param_frame.batchtimestart_menuitemvar,offvalue="",command=lambda: self.timeStartMenuLogic("batch"))
+        
+        self.gui.param_frame.createquery_button["command"] = self.getInputValues
+        self.gui.param_frame.credsourcesklist_radio["command"] = self.chooseCreds
+        self.gui.param_frame.credsourcetestrun_radio["command"] = self.chooseCreds
         
     def timeStartMenuLogic(self,varkey):
         self.gui.param_frame.__dict__[varkey + "timeend_menu"].delete(0,tk.END)             #Deletes any existing menu options in the "To" menu if they exist - due to re-selecting From time
@@ -68,7 +78,7 @@ class TMSGuiController:
                 if key.find("list") == -1 and key.find("button") == -1 and key.find("message") == -1 and key.find("credsource") == -1 and key.find("sklist") == -1: #Narrows down items to populate self.queryparams with - widget variables that are not listvars or buttonvars or messagevars or the credsourcevar
                     self.queryparams[key] = val.get().split(",")
         
-        for varkey in ["txn","capture"]:
+        for varkey in ["batch","txn","capture"]:
             varintersection = set([varkey + "timestart_menuitemvar",varkey + "timeend_menuitemvar"]) & set(list(self.queryparams.keys()))
             if varintersection != set([]):
                 if varintersection != set([varkey + "timestart_menuitemvar",varkey + "timeend_menuitemvar"]):
@@ -76,12 +86,13 @@ class TMSGuiController:
                     return
                 else:
                     self.gui.param_frame.query_messagevar.set("")                    
-                                
-        for listbox in ["capturestates","cardtypes","txnstates"]:           #block for finding any selections in the listboxes
-            if self.gui.param_frame.__dict__[listbox + "_listbox"].curselection() != (): #Checks if there is any selection in the current listbox by comparing selection vs empty tuple
-                self.queryparams[listbox] = []                                           #Prepares a dict entry as a list for selected entries
-                for index in self.gui.param_frame.__dict__[listbox + "_listbox"].curselection(): #For each selection, append it to list in dict created above
-                    self.queryparams[listbox].append(self.gui.param_frame.__dict__[listbox + "_listbox"].get(index))
+        
+        if self.gui.tmsop_menuitemvar.get() != "QueryBatch":                        
+            for listbox in ["capturestates","cardtypes","txnstates"]:           #block for finding any selections in the listboxes
+                if self.gui.param_frame.__dict__[listbox + "_listbox"].curselection() != (): #Checks if there is any selection in the current listbox by comparing selection vs empty tuple
+                    self.queryparams[listbox] = []                                           #Prepares a dict entry as a list for selected entries
+                    for index in self.gui.param_frame.__dict__[listbox + "_listbox"].curselection(): #For each selection, append it to list in dict created above
+                        self.queryparams[listbox].append(self.gui.param_frame.__dict__[listbox + "_listbox"].get(index))
         
         self.Query = QB.QueryBuilder(self.queryparams)
         if self.gui.param_frame.credsource_var.get() == "sklist":

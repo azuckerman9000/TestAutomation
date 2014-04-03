@@ -1,63 +1,79 @@
 import requests
-from requests.auth import HTTPBasicAuth
+import re
 import tkinter as tk
 
-#Online Batching Queues:
-#BMS.BatchSummary
-#BMS.BatchTxnFragment
-#TbWcf.GenericRequestQueue
-#TbWcf.GenericResponseQueue
-#TPS.Batch.Request
-#TPS.Batch.Response
 
 class RESTAdmin(tk.Frame):
     def __init__(self, master=None):
         tk.Frame.__init__(self, master)
         self.grid()
-        self.main_frame = tk.Frame(self,height=400,width=500)
-        self.main_frame.grid()
-        self.main_frame.grid_propagate(0)
+        self.main_frame = tk.Frame(self)
+        self.main_frame.grid()        
         
         self.createVariables()
         self.createWidgets()
         
-    def createVariables(self):
-        self.batchselector_menubuttonvar = tk.StringVar()
-        self.batchselector_menubuttonvar.set("Choose Selector")
-        self.batchselector_menuitemvar = tk.StringVar()
+    def createVariables(self):        
+        self.sessiontoken_var = tk.StringVar()
+        self.servicekey_var = tk.StringVar()
+        self.profilename_var = tk.StringVar()
         
-        self.batchvalue_var = tk.StringVar()
+        self.send_messagevar = tk.StringVar()
+        self.baseip_var = tk.StringVar()
+        self.baseip_var.set("10.173.135.15")
         
-    def createWidgets(self):
-        self.batchselector_menubutton = tk.Menubutton(self.main_frame,textvariable=self.batchselector_menubuttonvar,relief="raised")
-        self.batchselector_menubutton.grid(sticky=tk.NW,row=0,column=0)
-        self.batchselector_menu = tk.Menu(self.batchselector_menubutton)
-        self.batchselector_menubutton["menu"] = self.batchselector_menu
-        for selector in ["ptlsSessionToken","serviceKey","profileName"]:
-            self.batchselector_menu.add_checkbutton(label=selector,variable=self.batchselector_menuitemvar,onvalue=selector,offvalue="",command=self.updateSelectorMenu)
+    def createWidgets(self):        
+        self.sessiontoken_label = tk.Label(self.main_frame,text="PTLSSessionToken: ")
+        self.sessiontoken_label.grid(sticky=tk.NW,row=0,column=0)
+        self.servicekey_label = tk.Label(self.main_frame,text="ServiceKey: ")
+        self.servicekey_label.grid(sticky=tk.NW,row=1,column=0)
+        self.profilename_label = tk.Label(self.main_frame,text="MerchantProfileId: ")
+        self.profilename_label.grid(sticky=tk.NW,row=2,column=0)
+        self.baseip_label = tk.Label(self.main_frame,text="Host: ")
+        self.baseip_label.grid(sticky=tk.NW,row=3,column=0)
+        
+        self.sessiontoken_entry = tk.Entry(self.main_frame,textvariable=self.sessiontoken_var,width=70)
+        self.sessiontoken_entry.grid(sticky=tk.NW,row=0,column=1)
+        self.servicekey_entry = tk.Entry(self.main_frame,textvariable=self.servicekey_var,width=70)
+        self.servicekey_entry.grid(sticky=tk.NW,row=1,column=1)
+        self.profilename_entry = tk.Entry(self.main_frame,textvariable=self.profilename_var,width=70)
+        self.profilename_entry.grid(sticky=tk.NW,row=2,column=1)
+        self.baseip_entry = tk.Entry(self.main_frame,textvariable=self.baseip_var,width=70)
+        self.baseip_entry.grid(sticky=tk.NW,row=3,column=1)
+        
+        self.send_button = tk.Button(self.main_frame,text="Send Request",command=self.sendRequest)
+        self.send_button.grid(row=4,column=0,columnspan=2)
+        
+        self.send_message = tk.Message(self.main_frame,textvariable=self.send_messagevar,aspect=1000)
+        self.send_message.grid(row=5,column=0,columnspan=2)
+        
+        self.result_canvas = tk.Canvas(self.main_frame,relief=tk.RIDGE,bd=2,width=600) 
             
-        self.batchvalue_entry = tk.Entry(self.main_frame,textvariable=self.batchvalue_var,width=40)
-        self.batchvalue_entry.grid(sticky=tk.NW,row=0,column=1)
+    def sendRequest(self):
+        for Id in self.result_canvas.find_all():
+            self.result_canvas.delete(Id)
         
-        self.batchsend_button = tk.Button(self.main_frame,text="Send Request",state="disabled",command=self.sendbatchRequest)
-        self.batchsend_button.grid(sticky=tk.NW,row=0,column=2)
+        if self.sessiontoken_var.get() == "" or self.servicekey_var.get() == "":
+            self.send_messagevar.set("PTLSSessionToken and ServiceKey are required!")
+            self.send_message["fg"] = "red"
+            return
+        url = "http://" + self.baseip_var.get() + "/Admin/batch/resend?ptlsSessionToken=" + self.sessiontoken_var.get() + "&serviceKey=" + self.servicekey_var.get()
+        if self.profilename_entry.get() != "":
+            url += "&profileName=" + self.profilename_entry.get()
         
-        self.batchresult_canvas = tk.Canvas(self.main_frame,relief=tk.RIDGE,bd=2)
-            
-    def updateSelectorMenu(self):
-        self.batchselector_menubuttonvar.set(self.batchselector_menuitemvar.get())
-        if self.batchselector_menuitemvar.get() != "":
-            self.batchsend_button["state"] = "active"
-        else:
-            self.batchsend_button["state"] = "disabled"
-            
-    def sendbatchRequest(self):
-        url = "http://10.173.135.18/batch/resend?" + self.batchselector_menubuttonvar.get() + "='" + self.batchvalue_var.get() + "'"
-        r = requests.get(url)
-        self.batchresult_canvas.create_text(5,5,anchor=tk.NW,text="HTTP Status Code = " + str(r.status_code) + "\n" + r.text)
-        self.batchresult_canvas.grid(sticky=tk.N,row=1,column=0,columnspan=3)
-        
+        try:
+            r = requests.post(url)
+            successcode = re.search('(?:<IsSuccess>)(\w+)',r.text)
+            respmessage = re.search('(?:<Message>)([\w ]+)',r.text)
+            self.send_messagevar.set("ReSend Batch Request Sent.")
+            self.send_message["fg"] = "blue"                             
+            self.result_canvas.create_text(5,5,anchor=tk.NW,text="HTTP Status Code = " + str(r.status_code) + "\nIsSuccess = " + successcode.group(1) + "\nMessage = " +respmessage.group(1))            
+        except requests.exceptions.RequestException as errorstr:            
+            self.result_canvas.create_text(5,5,anchor=tk.NW,text=errorstr,width=600)
+            self.send_messagevar.set("An Exception Occurred.")
+            self.send_message["fg"] = "red" 
+        self.result_canvas.grid(sticky=tk.N,row=6,column=0,columnspan=2)
         
 restgui = RESTAdmin()
-restgui.master.title("CWS REST Admin")
+restgui.master.title("TPS:Re-Send Batch")
 restgui.mainloop()
