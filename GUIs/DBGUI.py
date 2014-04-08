@@ -101,7 +101,7 @@ class CreateMapRowFrame(tk.Frame):
             for choiceinfo in choicelist:
                 self.linkkey_classname[choiceinfo[1]] = classname
                 self.linkkey_recordid[choiceinfo[1]] = choiceinfo[0]
-                self.classname_linkkeys[classname].append(choiceinfo[1])
+                self.classname_linkkeys[classname].append(choiceinfo[1])        
             
         self.createVariables()
         self.createWidgets()        
@@ -116,7 +116,7 @@ class CreateMapRowFrame(tk.Frame):
     def createWidgets(self):
         self.recordstolink_scroll = tk.Scrollbar(self.createmaps_frame,orient=tk.VERTICAL)
         self.recordstolink_scroll.grid(sticky=tk.N+tk.S,row=0,column=1)        
-        self.recordstolink_listbox = tk.Listbox(self.createmaps_frame,width=30,listvariable=self.recordstolink_listvar,activestyle="dotbox",yscrollcommand=self.recordstolink_scroll.set)
+        self.recordstolink_listbox = tk.Listbox(self.createmaps_frame,width=30,listvariable=self.recordstolink_listvar,activestyle="dotbox",yscrollcommand=self.recordstolink_scroll.set,exportselection=0)
         self.recordstolink_scroll["command"] = self.recordstolink_listbox.yview
         self.recordstolink_listbox.grid(sticky=tk.N,row=0,column=0)
         
@@ -124,11 +124,13 @@ class CreateMapRowFrame(tk.Frame):
         
         self.linkchoices_scroll = tk.Scrollbar(self.createmaps_frame,orient=tk.VERTICAL)
         self.linkchoices_scroll.grid(sticky=tk.N+tk.S,row=0,column=3)        
-        self.linkchoices_listbox = tk.Listbox(self.createmaps_frame,width=30,listvariable=self.linkchoices_listvar,activestyle="dotbox",yscrollcommand=self.linkchoices_scroll.set)
+        self.linkchoices_listbox = tk.Listbox(self.createmaps_frame,width=30,listvariable=self.linkchoices_listvar,activestyle="dotbox",yscrollcommand=self.linkchoices_scroll.set,exportselection=0)
         self.linkchoices_scroll["command"] = self.linkchoices_listbox.yview
         self.linkchoices_listbox.grid(sticky=tk.N,row=0,column=2)
         
-        self.linkchoices_display = tk.Canvas(self.createmaps_frame,relief=tk.RIDGE,bd=2)
+        self.linkchoicesdisplay_scroll = tk.Scrollbar(self.createmaps_frame,orient=tk.VERTICAL)
+        self.linkchoices_display = tk.Canvas(self.createmaps_frame,relief=tk.RIDGE,bd=2,yscrollcommand=self.linkchoicesdisplay_scroll.set)
+        self.linkchoicesdisplay_scroll["command"] = self.linkchoices_display.yview
         
         self.createmaprow_button = tk.Button(self.createmaps_frame,text="Create Map Row",state="disabled",command=self.createMapFileRow)
         self.createmaprow_button.grid(sticky=tk.N,row=2,column=1,columnspan=2)
@@ -143,7 +145,7 @@ class CreateMapRowFrame(tk.Frame):
             self.linkchoices_listbox["selectmode"] = tk.BROWSE
         for Id in self.recordstolink_display.find_all():
             self.recordstolink_display.delete(Id)
-        self.recordstolink_display.create_text(0,0,anchor=tk.NW,text=self.DB.getRecord(self.reckey_recordid[selectedrec][1:],0))
+        self.recordstolink_display.create_text(0,0,anchor=tk.NW,text=self.DB.getRecord(self.reckey_recordid[selectedrec],0))
         self.recordstolink_display.grid(sticky=tk.N,row=1,column=0,columnspan=2)
         self.createmaprow_button["state"] = "disabled"
         self.showPossibleLinks(self.reckey_classname[selectedrec])
@@ -151,24 +153,29 @@ class CreateMapRowFrame(tk.Frame):
     def showPossibleLinks(self,classname):
         for Id in self.linkchoices_display.find_all():
             self.linkchoices_display.delete(Id)
-        self.linkchoices_listvar.set("")
+        for selection in self.linkchoices_listbox.curselection():
+            self.linkchoices_listbox.delete(selection)
+        templistvar = ""
         for linkkey in self.classname_linkkeys[classname]:
-            self.linkchoices_listvar.set(self.linkchoices_listvar.get() + linkkey + " ")        
+            templistvar += linkkey + " "            
+        self.linkchoices_listvar.set(templistvar)             
         self.linkchoices_listbox.bind("<ButtonRelease>",self.selectChoices)
         
     def selectChoices(self,event):
+        for Id in self.linkchoices_display.find_all():
+            self.linkchoices_display.delete(Id)   
         self.choices = []        
-        if len(event.widget.curselection()) > 1:            
+        if len(event.widget.curselection()) >= 1:            
             for index in event.widget.curselection():
-                self.choices.append(event.widget.get(index))
-        else:
-            self.choices.append(event.widget.get(event.widget.curselection()[0]))
+                self.choices.append(event.widget.get(index))        
         text = ""
         if len(self.choices) >= 1:
             for choice in self.choices:
-                text = text + self.DB.getRecord(self.linkkey_recordid[choice][1:],0) + "\n"
+                text = text + self.DB.getRecord(self.linkkey_recordid[choice],0) + "\n"
             self.linkchoices_display.create_text(0,0,anchor=tk.NW,text=text)
+            self.linkchoices_display.config(scrollregion=self.linkchoices_display.bbox(tk.ALL))
             self.linkchoices_display.grid(sticky=tk.N,row=1,column=2,columnspan=2)
+            self.linkchoicesdisplay_scroll.grid(sticky=tk.NW+tk.SW,row=1,column=4,columnspan=2)
             self.createmaprow_button["state"] = "active"
         else:
             self.createmaprow_button["state"] = "disabled"
@@ -181,10 +188,10 @@ class CreateMapRowFrame(tk.Frame):
             rowtemplate["@class"] = self.reckey_classname[selectedrec]
             if self.reckey_classname[selectedrec] == "Service":
                 rowtemplate["Key"] = "Svc"                
-                rowtemplate["MapList"] = list([self.choices])
+                rowtemplate["MapList"] = list(self.choices)
             elif self.reckey_classname[selectedrec] == "Credentials":
                 rowtemplate["Key"] = "SK"                
-                rowtemplate["MapList"] = list([self.choices])
+                rowtemplate["MapList"] = list(self.choices)
             elif self.reckey_classname[selectedrec] == "Merchant":
                 rowtemplate["Key"] = "Merch"                
                 rowtemplate["MapList"] = self.choices[0]
@@ -193,10 +200,11 @@ class CreateMapRowFrame(tk.Frame):
                 rowtemplate["MapList"] = self.choices[0]
             print(rowtemplate)
             del self.reckey_classname[selectedrec]
-            if len(self.reckey_classname.keys()) != 0:
-                self.recordstolink_listvar.set("")
+            if len(self.reckey_classname.keys()) != 0:                
+                templistvar = ""
                 for reckey in self.reckey_classname.keys():
-                    self.recordstolink_listvar.set(self.recordstolink_listvar.get() + reckey + " ")
+                    templistvar += reckey + " "
+                self.recordstolink_listvar.set(templistvar)
             else:
                 self.createmaps_frame.destroy()
                 self.quit()

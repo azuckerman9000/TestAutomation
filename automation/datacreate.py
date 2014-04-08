@@ -160,11 +160,7 @@ class Database:
         
         linkchoices = {}
         recstolink = {}            
-        for classname in linkind:
-            url = "http://localhost:2480/query/" + self.DBname + "/sql/select from " + classname + " where @version = 0"
-            r = requests.get(url,auth=HTTPBasicAuth('admin','admin'))
-            new_recs = json.loads(r.text)["result"]
-            
+        for classname in linkind:           
             mapid = ""
             maplinkid = ""
             mapclassid = ""
@@ -183,7 +179,11 @@ class Database:
             elif classname == "Application":
                 mapid = "ApplicationProfileId"
                 maplinkid = "ServiceKey"
-                mapclassid = "Credentials"            
+                mapclassid = "Credentials"
+                
+            url = "http://localhost:2480/query/" + self.DBname + "/sql/select from " + classname + " where " + maplinkid + " IS null"
+            r = requests.get(url,auth=HTTPBasicAuth('admin','admin'))
+            new_recs = json.loads(r.text)["result"]            
             
             url2 = "http://localhost:2480/query/" + self.DBname + "/sql/select from " + mapclassid
             if mapclassid not in linkchoices.keys():

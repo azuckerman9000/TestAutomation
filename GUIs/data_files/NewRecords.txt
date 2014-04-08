@@ -1,2 +1,2 @@
-Merchant|{"TenderType": "Credit", "MID": "xxxx", "CustomerPresent": "Present", "Environment": "TEST", "@class": "Merchant", "MerchantProfileId": "testtestmerch", "TID": "ffff", "IndustryType": "Restaurant", "MessageType": "REST", "EntryMode": "TrackDataFromMSR"}
-Credentials|{"Environment": "TEST", "MessageType": "SOAP", "ServiceKey": "testtestcred", "@class": "Credentials", "IdentityToken": "rrr"}
+Merchant|{"TenderType": "Credit", "MID": "xxxx", "CustomerPresent": "Present", "Environment": "TEST", "@class": "Merchant", "MerchantProfileId": "testtestmerch1", "TID": "ffff", "IndustryType": "Restaurant", "MessageType": "REST", "EntryMode": "TrackDataFromMSR"}
+Credentials|{"Environment": "TEST", "MessageType": "SOAP", "ServiceKey": "testtestcred1", "@class": "Credentials", "IdentityToken": "rrr"}
