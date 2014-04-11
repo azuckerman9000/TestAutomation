@@ -57,6 +57,15 @@
        <ns6:Phone xsi:nil="true"/>
        <ns6:Email xsi:nil="true"/>
       </ns6:AVSData>
+      <ns6:InternationalAVSData>
+       <ns6:HouseNumber></ns6:HouseNumber>
+       <ns6:Street></ns6:Street>
+       <ns6:POBoxNumber xsi:nil="true"/>
+       <ns6:City></ns6:City>
+       <ns6:StateProvince xsi:nil="true"/>
+       <ns6:PostalCode></ns6:PostalCode>
+       <ns6:Country>NotSet</ns6:Country>
+      </ns6:InternationalAVSData>
       <ns6:CVDataProvided>NotSet</ns6:CVDataProvided>
       <ns6:CVData></ns6:CVData>
       <ns6:KeySerialNumber></ns6:KeySerialNumber>

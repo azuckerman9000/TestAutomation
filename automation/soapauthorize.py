@@ -94,6 +94,7 @@ class SOAPRequest:
         CardDataNode = self.getParentNode("CardData")
         EcommSecNode = self.getParentNode("EcommerceSecurityData")        
         AVSNode = self.getParentNode("AVSData")
+        IntlAVSNode = self.getParentNode("InternationalAVSData")
         #Card Data Populate
         if self.TestCaseInfo["EntryMode"] == "Keyed": #Must get EntryMode from TestCase:TransactionData
             CardDataNode.remove(self.getChildNode(CardDataNode,"Track2Data"))
@@ -113,25 +114,36 @@ class SOAPRequest:
             TenderDataNode.remove(self.getChildNode(TenderDataNode,"EcommerceSecurityData"))            
         
         #CVData, AVSData and PINDebit Populate
-        ArgVals = set(["CVData","AVSData"])    
+        ArgVals = set(["CVData","AVSData","IntlAVSData"])    
         if self.TestCaseInfo["TenderType"] == "Credit" and set([]) == ArgVals & set(self.TestCaseInfo.keys()): #Case with Credit Tender, no CV, AVS            
             TenderDataNode.remove(self.getChildNode(TenderDataNode,"CardSecurityData"))            
         elif self.TestCaseInfo["TenderType"] == "Credit" and set(["CVData"]) == ArgVals & set(self.TestCaseInfo.keys()):
             self.getChildNode(CardSecNode,"CVDataProvided").text = self.TenderData["CardSecurityData"]["CVDataProvided"]
             self.getChildNode(CardSecNode,"CVData").text = self.TenderData["CardSecurityData"]["CVData"]
-            CardSecNode.remove(self.getChildNode(CardSecNode,"AVSData"))            
+            CardSecNode.remove(self.getChildNode(CardSecNode,"AVSData"))
+            CardSecNode.remove(self.getChildNode(CardSecNode,"IntlAVSData"))             
         elif self.TestCaseInfo["TenderType"] == "Credit" and set(["AVSData"]) == ArgVals & set(self.TestCaseInfo.keys()):
             self.getChildNode(AVSNode,"Street").text = self.TenderData["CardSecurityData"]["AVSData"]["Street"]
-            self.getChildNode(AVSNode,"PostalCode").text = self.TenderData["CardSecurityData"]["AVSData"]["PostalCode"]            
-        elif self.TestCaseInfo["TenderType"] == "Credit" and ArgVals == ArgVals & set(self.TestCaseInfo.keys()):
+            self.getChildNode(AVSNode,"PostalCode").text = self.TenderData["CardSecurityData"]["AVSData"]["PostalCode"]
+            CardSecNode.remove(self.getChildNode(CardSecNode,"IntlAVSData"))
+        elif self.TestCaseInfo["TenderType"] == "Credit" and set(["IntlAVSData"]) == ArgVals & set(self.TestCaseInfo.keys()):
+            self.getChildNode(IntlAVSNode,"HouseNumber").text = self.TenderData["CardSecurityData"]["IntlAVSData"]["HouseNumber"]
+            self.getChildNode(IntlAVSNode,"Street").text = self.TenderData["CardSecurityData"]["IntlAVSData"]["Street"]
+            self.getChildNode(IntlAVSNode,"PostalCode").text = self.TenderData["CardSecurityData"]["IntlAVSData"]["PostalCode"]
+            self.getChildNode(IntlAVSNode,"City").text = self.TenderData["CardSecurityData"]["IntlAVSData"]["City"]
+            self.getChildNode(IntlAVSNode,"Country").text = self.TenderData["CardSecurityData"]["IntlAVSData"]["Country"]
+            CardSecNode.remove(self.getChildNode(CardSecNode,"AVSData"))            
+        elif self.TestCaseInfo["TenderType"] == "Credit" and set(["AVSData","CVData"]) == ArgVals & set(self.TestCaseInfo.keys()):
             self.getChildNode(AVSNode,"Street").text = self.TenderData["CardSecurityData"]["AVSData"]["Street"]
             self.getChildNode(AVSNode,"PostalCode").text = self.TenderData["CardSecurityData"]["AVSData"]["PostalCode"]
             self.getChildNode(CardSecNode,"CVDataProvided").text = self.TenderData["CardSecurityData"]["CVDataProvided"]
-            self.getChildNode(CardSecNode,"CVData").text = self.TenderData["CardSecurityData"]["CVData"]            
+            self.getChildNode(CardSecNode,"CVData").text = self.TenderData["CardSecurityData"]["CVData"]
+            CardSecNode.remove(self.getChildNode(CardSecNode,"IntlAVSData"))            
         elif self.TestCaseInfo["TenderType"] == "PINDebit" and set([]) == ArgVals & set(self.TestCaseInfo.keys()):
             self.getChildNode(CardSecNode,"KeySerialNumber").text = self.TenderData["CardSecurityData"]["KeySerialNumber"]
             self.getChildNode(CardSecNode,"PIN").text = self.TenderData["CardSecurityData"]["PIN"]
-            CardSecNode.remove(self.getChildNode(CardSecNode,"AVSData"))            
+            CardSecNode.remove(self.getChildNode(CardSecNode,"AVSData"))
+            CardSecNode.remove(self.getChildNode(CardSecNode,"IntlAVSData"))                  
     
     def setTransactionRequestObject(self):
         docURL = "http://localhost:2480/document/" + self.DBname + "/"        

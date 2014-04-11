@@ -40,12 +40,11 @@
      <ns3:SwipeStatus xsi:nil="true" />
      <ns3:DeviceSerialNumber xsi:nil="true" />
      <ns4:CardData>
-      <ns4:CardType>MasterCard</ns4:CardType>
+      <ns4:CardType>Visa</ns4:CardType>
       <ns4:CardholderName>John Doe</ns4:CardholderName>
-      <ns4:PAN>5499990123456781</ns4:PAN>
-      <ns4:Expire>1215</ns4:Expire>
       <ns4:Track1Data xsi:nil="true" />
-      </ns4:CardData>
+      <ns4:Track2Data>4003000123456781=15125025432198712345</ns4:Track2Data>
+     </ns4:CardData>
      </ns4:TenderData>
     <ns4:TransactionData xsi:type="ns2:BankcardTransactionDataPro">
      <ns3:Amount>1.00</ns3:Amount>
@@ -56,9 +55,9 @@
      <ns4:AccountType>NotSet</ns4:AccountType>
      <ns4:AlternativeMerchantData xsi:nil="true" />
      <ns4:ApprovalCode xsi:nil="true" />
-     <ns4:CustomerPresent>Ecommerce</ns4:CustomerPresent>
-     <ns4:EmployeeId />
-     <ns4:EntryMode>Keyed</ns4:EntryMode>
+     <ns4:CustomerPresent>Present</ns4:CustomerPresent>
+     <ns4:EmployeeId>2</ns4:EmployeeId>
+     <ns4:EntryMode>TrackDataFromMSR</ns4:EntryMode>
      <ns4:InternetTransactionData xsi:nil="true" />
      <ns4:InvoiceNumber xsi:nil="true" />
      <ns4:OrderNumber>1</ns4:OrderNumber>
@@ -75,7 +74,7 @@
     </ns4:TransactionData>
     </transaction>
    <applicationProfileId>2601</applicationProfileId>
-   <merchantProfileId>Auto_SOAP_Ecommerce</merchantProfileId>
+   <merchantProfileId>Auto_SOAP_Retail</merchantProfileId>
    <workflowId>1257A00001</workflowId>
   </Authorize>
  </SOAP-ENV:Body>

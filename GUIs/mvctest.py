@@ -1,111 +1,181 @@
-from tkinter import *
+import abc
+import requests
+import json
+from globalvars import globalvars
+from requests.auth import HTTPBasicAuth
 
-class MyCanvas(Frame):
-
-    def __init__(self, root):
-        Frame.__init__(self, root)
-
-        self.canvas = Canvas(self)
-        self.canvas.pack(fill=BOTH, expand=1)
-
-        # standard bindings
-        self.canvas.bind("<Double-Button-1>", self.set_focus)
-        self.canvas.bind("<Button-1>", self.set_cursor)
-        self.canvas.bind("<Key>", self.handle_key)
-
-        # add a few items to the canvas
-        self.canvas.create_text(50, 50, text="hello")
-        self.canvas.create_text(50, 100, text="world")
-
-    def highlight(self, item):
-        # mark focused item.  note that this code recreates the
-        # rectangle for each update, but that's fast enough for
-        # this case.
-        bbox = self.canvas.bbox(item)
-        self.canvas.delete("highlight")
-        if bbox:
-            i = self.canvas.create_rectangle(
-                bbox, fill="white",
-                tag="highlight"
-                )
-            self.canvas.lower(i, item)
-
-    def has_focus(self):
-        return self.canvas.focus()
-
-    def has_selection(self):
-        # hack to work around bug in Tkinter 1.101 (Python 1.5.1)
-        return self.canvas.tk.call(self.canvas._w, 'select', 'item')
-
-    def set_focus(self, event):
-        if self.canvas.type(CURRENT) != "text":
-            return
-
-        self.highlight(CURRENT)
-
-        # move focus to item
-        self.canvas.focus_set() # move focus to canvas
-        self.canvas.focus(CURRENT) # set focus to text item
-        self.canvas.select_from(CURRENT, 0)
-        self.canvas.select_to(CURRENT, END)
-
-    def set_cursor(self, event):
-        # move insertion cursor
-        item = self.has_focus()
-        if not item:
-            return # or do something else
-
-        # translate to the canvas coordinate system
-        x = self.canvas.canvasx(event.x)
-        y = self.canvas.canvasy(event.y)
-
-        self.canvas.icursor(item, "@%d,%d" % (x, y))
-        self.canvas.select_clear()
-
-    def handle_key(self, event):
-        # widget-wide key dispatcher
-        item = self.has_focus()
-        if not item:
-            return
-
-        insert = self.canvas.index(item, INSERT)
-
-        if event.char >= " ":
-            # printable character
-            if self.has_selection():
-                self.canvas.dchars(item, SEL_FIRST, SEL_LAST)
-                self.canvas.select_clear()
-            self.canvas.insert(item, "insert", event.char)
-            self.highlight(item)
-
-        elif event.keysym == "BackSpace":
-            if self.has_selection():
-                self.canvas.dchars(item, SEL_FIRST, SEL_LAST)
-                self.canvas.select_clear()
+class CWSDataQuery(object):
+    __metaclass__ = abc.ABCMeta    
+        
+    @abc.abstractmethod
+    def getRecord(self):
+        pass
+        #Abstract Method for querying OrientDB for data
+        
+    @abc.abstractmethod
+    def buildQueryString(self):
+        pass
+        
+    @property
+    @abc.abstractmethod       
+    def recordid(self):
+        pass
+        #Abstract property for recordid
+        
+    @property
+    @abc.abstractmethod       
+    def classkey(self):
+        pass
+        #Abstract property for class specific keys - eg. ServiceId, ServiceKey   
+    
+    @classmethod
+    def __subclasshook__(cls,C):
+        if cls is CWSDataQuery:
+            if hasattr(C,"getRecord"):
+                return True
+        return NotImplemented
+            
+class Service(CWSDataQuery):    
+            
+    def getRecord(self,Host,Workflow):
+        url = "http://localhost:2480/query/" + globalvars.DBNAME + "/sql/select from Service where Host = '" + Host + "' and Workflow = '" + Workflow + "'"
+        r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
+        svc_resp = json.loads(r1.text)
+        self._recordid = svc_resp["result"][0]["@rid"]
+        self.ServiceId = svc_resp["result"][0]["ServiceId"]
+    
+    @property  
+    def recordid(self):
+        return self._recordid
+    
+    @property  
+    def classkey(self):
+        return self.ServiceId
+    
+class Credentials(CWSDataQuery):
+    def getRecord(self,Environment,MessageType,ServiceId):
+        url = "http://localhost:2480/query/" + globalvars.DBNAME + "/sql/select from Credentials where Environment = '" + Environment + "' and ServiceId contains '" + ServiceId + "' and MessageType = '" + self.MessageType + "'"
+        r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
+        cred_resp = json.loads(r1.text)
+        self._recordid = cred_resp["result"][0]["@rid"]
+        self.ServiceKey = cred_resp["result"][0]["ServceKey"]
+        
+    @property    
+    def recordid(self):
+        return self._recordid
+    
+    @property  
+    def classkey(self):
+        return self.ServiceKey
+    
+class CardData(CWSDataQuery):
+    def __init__(self,Environment,CardType):
+        self.CardType = CardType
+        self.Environment = Environment
+         
+    def getRecord(self):
+        url = "http://localhost:2480/query/" + globalvars.DBNAME + "/sql/select from CardData where Environment = '" + self.Environment + "' and CardType = '" + self.CardType + "'"
+        r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
+        card_resp = json.loads(r1.text)
+        self._recordid = card_resp["result"][0]["@rid"]
+        self.PAN = card_resp["result"][0]["PAN"]
+        
+    def buildQueryString(self):
+        return " and any() traverse (CardType = '" + self.CardType + "' and Environment = '" + self.Environment + "')"
+    
+    @property    
+    def recordid(self):
+        return self._recordid
+    
+    @property  
+    def classkey(self):
+        return self.PAN
+        
+class CardSecurityData(CWSDataQuery):
+    def __init__(self,TenderType,*cardsecargs):
+        self.TenderType = TenderType
+        self.cardsecargs = cardsecargs
+                
+    def getRecord(self,PAN):
+        url = "http://localhost:2480/query/" + globalvars.DBNAME + "/sql/select from CardSecurityData where PAN = '" + PAN + "' and"
+        for arg in globalvars.CARDSECARGS:
+            if arg in self.cardsecargs:
+                url += arg + " is not null and "
             else:
-                if insert > 0:
-                    self.canvas.dchars(item, insert-1, insert)
-            self.highlight(item)
-
-        # navigation
-        elif event.keysym == "Home":
-            self.canvas.icursor(item, 0)
-            self.canvas.select_clear()
-        elif event.keysym == "End":
-            self.canvas.icursor(item, END)
-            self.canvas.select_clear()
-        elif event.keysym == "Right":
-            self.canvas.icursor(item, insert+1)
-            self.canvas.select_clear()
-        elif event.keysym == "Left":
-            self.canvas.icursor(item, insert-1)
-            self.canvas.select_clear()
-
+                url += arg + " is null and "
+        if self.TenderType == "PINDebit":
+            url += "PIN is not null"
         else:
-            pass # print event.keysym
+            url += "PIN is null"
+        r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
+        cardsec_resp = json.loads(r1.text)
+        self._recordid = cardsec_resp["result"][0]["@rid"]
+    
+    def buildQueryString(self):
+        if len(self.cardsecargs) == 0 and self.TenderType != "PINDebit":
+            self._recordid = None            
+            return "' and CardSecurityData is null "
+        query = "' and any() traverse (PAN=$PAN and "        
+        for arg in globalvars.CARDSECARGS:
+            if arg in self.cardsecargs:
+                query += arg + " is not null and "
+            else:
+                query += arg + " is null and "
+        if self.TenderType == "PINDebit":
+            query += "PIN is not null)"
+        else:
+            query += "PIN is null)"
+        return query
+        
+    @property    
+    def recordid(self):
+        return self._recordid
+    
+    @property  
+    def classkey(self):
+        return None
 
-# try it out (double-click on a text to enable editing)
-c = MyCanvas(Tk())
-c.pack()
+class EcommerceSecurityData(CWSDataQuery):
+    def __init__(self,EcommSecureInd):
+        self.EcommSecureInd = EcommSecureInd
+        
+    def getRecord(self,PAN):
+        url = "http://localhost:2480/query/" + globalvars.DBNAME + "/sql/select from EcommerceSecurityData where PAN = '" + PAN + "'"
+        r1 = requests.get(url, auth=HTTPBasicAuth('admin','admin'))
+        ecommsec_resp = json.loads(r1.text)
+        self._recordid = ecommsec_resp["result"][0]["@rid"]
+        
+    def buildQueryString(self):
+        if self.EcommSecureInd == None:
+            self._recordid = None
+            return " and EcommerceSecurityData is null "            
+        else:
+            return " and EcommerceSecurityData.PAN = $PAN "
+        
+    @property    
+    def recordid(self):
+        return self._recordid
+    
+    @property  
+    def classkey(self):
+        return None
+        
+class TenderObject:
+    def __init__(self,TenderType,Environment,CardType,EcommSecureInd,*cardsecargs):
+        self.card = CardData(Environment,CardType)
+        self.cardsec = CardSecurityData(TenderType,*cardsecargs)
+        self.ecommsec = EcommerceSecurityData(EcommSecureInd)
+        query = "select from TenderData let $PAN = CardData.PAN where TenderType = '" + TenderType + self.cardsec.buildQueryString() + self.ecommsec.buildQueryString() + self.card.buildQueryString()        
+        r1 = requests.get("http://localhost:2480/query/" + globalvars.DBNAME + "/sql/" + query,auth=HTTPBasicAuth('admin','admin'))
+        if json.loads(r1.text)["result"] == []:
+            #self.createTenderRecord()
+            print(self.ecommsec.recordid)
+        
+    def createTenderRecord(self):
+        self.card.getRecord()        
+        self.cardsec.getRecord(self.card.classkey)
+        
 
-mainloop()
+TenderObject("Credit","TEST","Visa",None,"AVSData","CVData")
+
+

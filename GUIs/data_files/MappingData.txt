@@ -5,8 +5,8 @@
 {"@class":"Map","Key":"Svc","Id":"A021700011","MapList":["6B2866C8FD500001","23CE26C8FD500001","83D9854308400001","BD92E5C0AEF00001"]}
 {"@class":"Map","Key":"Svc","Id":"A121700011","MapList":["6B2866C8FD500001","23CE26C8FD500001","83D9854308400001","BD92E5C0AEF00001"]}
 {"@class":"Map","Key":"Svc","Id":"1257A00001","MapList":["6B2866C8FD500001","23CE26C8FD500001"]}
-{"@class":"Map","Key":"SK","Id":"6B2866C8FD500001","MapList":["911C800001","39C6700001","A77A300001","4C85600001","A021700011","A121700011","1257A00001"]}
-{"@class":"Map","Key":"SK","Id":"23CE26C8FD500001","MapList":["911C800001","39C6700001","A77A300001","4C85600001","A021700011","A121700011","1257A00001"]}
+{"@class":"Map","Key":"SK","Id":"6B2866C8FD500001","MapList":["911C800001","39C6700001","A77A300001","4C85600001","A021700011","A121700011","1257A00001","372EC00001"]}
+{"@class":"Map","Key":"SK","Id":"23CE26C8FD500001","MapList":["911C800001","39C6700001","A77A300001","4C85600001","A021700011","A121700011","1257A00001","372EC00001"]}
 {"@class":"Map","Key":"SK","Id":"83D9854308400001","MapList":["39C6700001","4C85600001","A021700011","A121700011"]}
 {"@class":"Map","Key":"SK","Id":"BD92E5C0AEF00001","MapList":["39C6700001","4C85600001","A021700011","A121700011"]}
 {"@class":"Map","Key":"Merch","Id":"MagensaMerch","MapList":["A121700011"]}
@@ -75,3 +75,8 @@
 {"@class":"Map","Key":"Merch","Id":"Auto-Restaurant_REST","MapList":["5717F1300C"]}
 {"@class":"Map","Key":"Merch","Id":"Auto-Ecomm_REST","MapList":["5717F1300C"]}
 {"@class":"Map","Key":"Merch","Id":"Auto-MOTO_REST","MapList":["5717F1300C"]}
+{"Id": "372EC00001", "Key": "Svc", "@class": "Map", "MapList": ["6B2866C8FD500001", "23CE26C8FD500001"]}
+{"Id": "EVOIntl_REST_Ecommerce_HostCap", "Key": "Merch", "@class": "Map", "MapList": ["372EC00001"]}
+{"Id": "EVOIntl_REST_MOTO_HostCap", "Key": "Merch", "@class": "Map", "MapList": ["372EC00001"]}
+{"Id": "EVOIntl_SOAP_Ecommerce_HostCap", "Key": "Merch", "@class": "Map", "MapList": ["372EC00001"]}
+{"Id": "EVOIntl_SOAP_MOTO_HostCap", "Key": "Merch", "@class": "Map", "MapList": ["372EC00001"]}

@@ -12,7 +12,7 @@ global MESSAGETYPES
 MESSAGETYPES = ["SOAP","REST"]
 
 global HOSTNAMES
-HOSTNAMES = ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS"]
+HOSTNAMES = ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS","EVOIntl HostCap Sandbox"]
 
 global INDUSTRYTYPES
 INDUSTRYTYPES = ["Retail","Restaurant","MOTO","Ecommerce"]
@@ -27,10 +27,16 @@ global CARDTYPES
 CARDTYPES = ["Visa","MasterCard","Discover","AmericanExpress"]
 
 global OPTIONALARGS
-OPTIONALARGS = ["CVData","AVSData","BillPay"]
+OPTIONALARGS = ["CVData","AVSData","IntlAVSData","BillPay","3DSecure","Level2"]
 
 global LEVEL2ARGS
 LEVEL2ARGS = ["Exempt","NotExempt"]
 
 global BILLPAYARGS
 BILLPAYARGS = ["Recurring","Installment"]
+
+global CARDSECARGS
+CARDSECARGS = ["CVData","AVSData","IntlAVSData"]
+
+global TENDERCLASSES
+TENDERCLASSES = ["CardData","CardSecurityData"]#,"EcommerceSecurityData"]

@@ -203,7 +203,7 @@ class TCBuildGui(tk.Frame):
             menu = varname + "_menu"
             self.optionals.__dict__[menubutton].destroy()
             self.optionals.__dict__[menu].destroy()
-        for varname in ["cv","avs","threed"]:
+        for varname in ["cv","threed"]:
             button = varname + "_button"
             self.optionals.__dict__[button].destroy()        
         self.optionals.createVariables()
@@ -281,36 +281,40 @@ class OptionalArgsFrame:
         self.cv_label.grid(sticky=tk.NW,row=1,column=0)
         
         self.avs_label = tk.Label(self.optargs_frame, text="Include AVSData:")
-        self.avs_label.grid(sticky=tk.NW,row=2,column=0)
+        self.avs_label.grid(sticky=tk.W,row=2,column=0,rowspan=2)        
         
         self.threed_label = tk.Label(self.optargs_frame, text="Include 3DSecure:")
-        self.threed_label.grid(sticky=tk.NW,row=3,column=0)
+        self.threed_label.grid(sticky=tk.NW,row=4,column=0)
         
         self.level2_label = tk.Label(self.optargs_frame, text="Include Level2Data:")
-        self.level2_label.grid(sticky=tk.NW,row=4,column=0)
+        self.level2_label.grid(sticky=tk.NW,row=5,column=0)
         
         self.billpay_label = tk.Label(self.optargs_frame, text="Include BillPayment:")
-        self.billpay_label.grid(sticky=tk.NW,row=5,column=0)
+        self.billpay_label.grid(sticky=tk.NW,row=6,column=0)
         
     def createWidgets(self):
         self.cv_button = tk.Checkbutton(self.optargs_frame,text="CVData",variable=self.cv_var,onvalue="CVData",offvalue="")
         self.cv_button.grid(sticky=tk.NW,row=1,column=1)
         
-        self.avs_button = tk.Checkbutton(self.optargs_frame,text="AVSData",variable=self.avs_var,onvalue="AVSData",offvalue="")
-        self.avs_button.grid(sticky=tk.NW,row=2,column=1)
+        #self.avs_button = tk.Checkbutton(self.optargs_frame,text="AVSData",variable=self.avs_var,onvalue="AVSData",offvalue="")
+        #self.avs_button.grid(sticky=tk.NW,row=2,column=1)
+        self.avs_radio = tk.Radiobutton(self.optargs_frame,value="AVSData",variable=self.avs_var,text="AVSData")
+        self.avs_radio.grid(sticky=tk.W,row=2,column=1)        
+        self.intlavs_radio = tk.Radiobutton(self.optargs_frame,value="IntlAVSData",variable=self.avs_var,text="IntlAVSData")
+        self.intlavs_radio.grid(sticky=tk.W,row=3,column=1)        
         
         self.threed_button = tk.Checkbutton(self.optargs_frame,text="3DSecure",variable=self.threed_var,onvalue="3DSecure",offvalue="")
-        self.threed_button.grid(sticky=tk.NW,row=3,column=1)
+        self.threed_button.grid(sticky=tk.NW,row=4,column=1)
         
         self.level2_menubutton = tk.Menubutton(self.optargs_frame,relief="raised",textvariable=self.level2_menuvar, state="active")
-        self.level2_menubutton.grid(sticky=tk.NW,row=4,column=1)
+        self.level2_menubutton.grid(sticky=tk.NW,row=5,column=1)
         self.level2_menu = tk.Menu(self.level2_menubutton)
         self.level2_menubutton["menu"] = self.level2_menu
         for item in globalvars.LEVEL2ARGS:
             self.level2_menu.add_checkbutton(label=item,variable=self.level2_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("level2"))
             
         self.billpay_menubutton = tk.Menubutton(self.optargs_frame,relief="raised",textvariable=self.billpay_menuvar, state="active")
-        self.billpay_menubutton.grid(sticky=tk.NW,row=5,column=1)
+        self.billpay_menubutton.grid(sticky=tk.NW,row=6,column=1)
         self.billpay_menu = tk.Menu(self.billpay_menubutton)
         self.billpay_menubutton["menu"] = self.billpay_menu
         for item in globalvars.BILLPAYARGS:
@@ -364,8 +368,8 @@ class ViewExistingTests:
         for key,val in self.TestCases.items(): #CReates display map of testcase description and info
             val["TCRecordId"] = key
             dispstring = val["MessageType"] +"-" + re.sub(r" ","-",val["Host"]) + "-" +val["IndustryType"] + "-" + val["CardType"]
-            if set([]) !=  set(globalvars.OPTIONALARGS) & set(val.keys()):
-                for key in list(set(globalvars.OPTIONALARGS) & set(val.keys())):
+            if set([]) !=  set(["3DSecure","AVSData","CVData","IntlAVSData"]) & set(val.keys()):
+                for key in list(set(["3DSecure","AVSData","CVData","IntlAVSData"]) & set(val.keys())):
                     dispstring = dispstring + "-" + key
             if "BillPay" in val.keys():
                 dispstring = dispstring + "-" + "BillPay:" + val["BillPay"]

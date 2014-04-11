@@ -166,25 +166,32 @@ class Transaction:
     
     def getTenderClasses(self): #Updated method with self.args instead of TenderType
         clustURL = "http://localhost:2480/cluster/"    + self.DBname + "/"        
-        if "AVSData" in self.args and "CVData" in self.args:
-            r1 = requests.get(url = clustURL + "CardSecurityData", auth=HTTPBasicAuth('admin','admin'))
+        if "AVSData" in self.args and "CVData" in self.args and "IntlAVSData" not in self.args:
+            r1 = requests.get(url = clustURL + "CardSecurityData/50", auth=HTTPBasicAuth('admin','admin'))
             cardsec_resp = json.loads(r1.text)
             for record in cardsec_resp["result"]:
                 if "AVSData" in record.keys() and record["PAN"] == self.PAN and record["CVDataProvided"] == "Provided":
                     self.CardSecurityRecordId = record["@rid"]
                     break
-        elif "AVSData" in self.args and "CVData" not in self.args:
+        elif "AVSData" in self.args and "CVData" not in self.args and "IntlAVSData" not in self.args:
             r1 = requests.get(url = clustURL + "CardSecurityData", auth=HTTPBasicAuth('admin','admin'))
             cardsec_resp = json.loads(r1.text)
             for record in cardsec_resp["result"]:
                 if "AVSData" in record.keys() and record["PAN"] == self.PAN and record["CVDataProvided"] == "NotSet":
                     self.CardSecurityRecordId = record["@rid"]
                     break
-        elif "AVSData" not in self.args and "CVData" in self.args:
+        elif "AVSData" not in self.args and "CVData" in self.args and "IntlAVSData" not in self.args:
             r1 = requests.get(url = clustURL + "CardSecurityData", auth=HTTPBasicAuth('admin','admin'))
             cardsec_resp = json.loads(r1.text)
             for record in cardsec_resp["result"]:
                 if record["CVDataProvided"] == "Provided" and self.PAN == record["PAN"] and "AVSData" not in record.keys():
+                    self.CardSecurityRecordId = record["@rid"]
+                    break
+        elif "IntlAVSData" in self.args:
+            r1 = requests.get(url = clustURL + "CardSecurityData", auth=HTTPBasicAuth('admin','admin'))
+            cardsec_resp = json.loads(r1.text)
+            for record in cardsec_resp["result"]:
+                if "IntlAVSData" in record.keys() and self.PAN == record["PAN"]:
                     self.CardSecurityRecordId = record["@rid"]
                     break
         if "3DSecure" in self.args:            
@@ -206,10 +213,10 @@ class Transaction:
             print("Must manually swipe Card for Data.")        
     
     def checkForTenderRecord(self):
-        clustURL = "http://localhost:2480/cluster/"    + self.DBname + "/"
+        clustURL = "http://localhost:2480/cluster/" + self.DBname + "/"
         PresentRecords = {}
         MissingRecords = []
-        if self.CardRecordId !=    "":
+        if self.CardRecordId != "":
             PresentRecords["CardData"] = self.CardRecordId
         else:
             MissingRecords.append("CardData")
@@ -293,7 +300,7 @@ class Transaction:
         for key, value in self.__dict__.items():
             if value != "" and key != "args":
                 TestCaseParams[key] = value
-        for item in list(set(["3DSecure","AVSData","CVData","BillPay","Level2"]) & set(self.args)):
+        for item in list(set(globalvars.OPTIONALARGS) & set(self.args)):
             TestCaseParams[item] = True
             
         self.TestCaseRecordId = ""        
@@ -322,8 +329,8 @@ class Transaction:
             elif key.find("RecordId") == -1 and key != "args" and value != "":
                 TestCaseInfo[key] = value
         
-        if set([]) != set(["3DSecure","AVSData","CVData"]) & set(self.args):
-            for item in list(set(["3DSecure","AVSData","CVData"]) & set(self.args)):
+        if set([]) != set(["3DSecure","AVSData","CVData","IntlAVSData"]) & set(self.args):
+            for item in list(set(["3DSecure","AVSData","CVData","IntlAVSData"]) & set(self.args)):
                 TestCaseInfo[item] = True
         if "BillPay" in self.args:
             TestCaseInfo["BillPay"] = self.BillPayment
@@ -414,7 +421,7 @@ class Transaction:
             print('Too Many arguments for Level2 found in args. Exactly 1 required.')
             sys.exit()
         #CVData, AVSData, BillPay, Rules
-        TenderArgs = set(globalvars.OPTIONALARGS)    
+        TenderArgs = set(["CVData","AVSData","IntlAVSData","BillPay"])    
         if list(TenderArgs & set(self.args)) and self.IndustryType in ["Retail","Restaurant"]:
             print("No " + ",".join([str(i) for i in TenderArgs]) + ", for IndustryType: " + self.IndustryType)
             sys.exit()

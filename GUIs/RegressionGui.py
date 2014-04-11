@@ -52,21 +52,21 @@ class RegressionGui(tk.Frame):
         self.envselect_menubutton.grid(sticky=tk.NW,row=1,column=0)
         self.envselect_menu = tk.Menu(self.envselect_menubutton)
         self.envselect_menubutton["menu"] = self.envselect_menu
-        for item in ["TEST","CERT","PROD"]:
+        for item in globalvars.ENVIRONMENTS:
             self.envselect_menu.add_checkbutton(label=item,variable=self.envselect_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("envselect"))
         
         self.messagetype_menubutton = tk.Menubutton(self.main_frame,relief="raised",textvariable=self.messagetype_menuvar,state="active")
         self.messagetype_menubutton.grid(sticky=tk.NW,row=1,column=1)
         self.messagetype_menu = tk.Menu(self.messagetype_menubutton)
         self.messagetype_menubutton["menu"] = self.messagetype_menu
-        for item in ["SOAP","REST"]:
+        for item in globalvars.MESSAGETYPES:
             self.messagetype_menu.add_checkbutton(label=item,variable=self.messagetype_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("messagetype"))
         
         self.hosttype_menubutton = tk.Menubutton(self.main_frame,relief="raised",textvariable=self.hosttype_menuvar,state="active")
         self.hosttype_menubutton.grid(sticky=tk.NW,row=1,column=2)
         self.hosttype_menu = tk.Menu(self.hosttype_menubutton)
         self.hosttype_menubutton["menu"] = self.hosttype_menu
-        for item in ["EVO HostCap TestHost","EVO TermCap TestHost","EVO HostCap Sandbox","EVO TermCap Sandbox","EVO TermCap AutoResponder","EVO TermCap TPS","EVO HostCap TPS"]:
+        for item in globalvars.HOSTNAMES:
             self.hosttype_menu.add_checkbutton(label=item,variable=self.hosttype_menuitemvar,onvalue=item,offvalue="", command=lambda : self.updateButton("hosttype"))
         
         self.tcdisp_scroll = tk.Scrollbar(self.main_frame,orient=tk.VERTICAL)
